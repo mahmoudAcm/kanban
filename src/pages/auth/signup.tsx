@@ -1,5 +1,5 @@
 import { Box, Link, Typography } from '@mui/material';
-import AuthLayout, { divider, StyledButton } from '@/src/components/Auth/AuthLayout';
+import AuthLayout, { divider, StyledButton } from '@/src/components/layouts/AuthLayout';
 import Input from '@/src/components/Auth/Input';
 import { ReactNode, useState } from 'react';
 import GoogleProvider from '@/src/components/Auth/GoogleProvider';
