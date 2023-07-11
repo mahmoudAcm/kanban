@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Box, styled } from '@mui/material';
 import Header from '@/src/components/Header';
+import Sidebar from '@/src/components/Sidebar';
 
 const MainLayoutRoot = styled(Box)(({ theme }) => ({
   display: 'grid',
@@ -18,23 +19,12 @@ const MainLayoutRoot = styled(Box)(({ theme }) => ({
   }
 }));
 
-const Sidebar = styled(Box)(({ theme }) => ({
-  background: theme.palette.__mode === 'DARK' ? 'var(--dark-grey)' : 'white',
-  gridRow: 'span 2',
-  height: '100%',
-  borderRight: `1px solid ${theme.palette.divider}`,
-  [theme.breakpoints.down('sm')]: {
-    display: 'none'
-  }
-}));
-
 export default function MainLayout({ children }: { children: ReactNode }) {
   return (
     <MainLayoutRoot>
       <Sidebar />
       <Box
         sx={{
-          height: '100%',
           background: theme => (theme.palette.__mode === 'DARK' ? 'var(--dark-grey)' : 'white'),
           borderBottom: theme => `1px solid ${theme.palette.divider}`
         }}
