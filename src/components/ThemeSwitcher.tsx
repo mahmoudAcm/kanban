@@ -27,7 +27,7 @@ const SwitchRoot = styled(Switch)(({ theme }) => ({
       }
     }
   },
-  '&:hover .MuiSwitch-track': {
+  '&:hover .MuiSwitch-track, &:has(.Mui-focusVisible) .MuiSwitch-track': {
     backgroundColor: 'var(--main-purple-hover) !important'
   },
   '& .MuiSwitch-track': {
@@ -68,7 +68,16 @@ export default function ThemeSwitcher() {
   return (
     <ThemeSwitcherRoot>
       <LightIcon />
-      <SwitchRoot checked={mode === 'DARK'} onChange={toggleTheme} />
+      <SwitchRoot
+        checked={mode === 'DARK'}
+        onChange={toggleTheme}
+        onKeyDown={evt => {
+          if (evt.key === 'Enter') toggleTheme();
+        }}
+        inputProps={{
+          'aria-label': 'theme switcher'
+        }}
+      />
       <DarkIcon />
     </ThemeSwitcherRoot>
   );
