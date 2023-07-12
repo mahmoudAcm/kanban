@@ -4,6 +4,7 @@ import DestructiveButton from '@/src/components/buttons/DestructiveButton';
 import TextField from '@/src/components/inputs/TextField';
 import DropDown from '@/src/components/inputs/DropDown';
 import { MouseEventHandler, useState } from 'react';
+import ThemeSwitcher from '@/src/components/ThemeSwitcher';
 
 function Home() {
   const [selectValue, setSelectValue] = useState('Doing');
@@ -90,6 +91,7 @@ function Home() {
           </MenuItem>
         </DropDown>
       </Box>
+      <ThemeSwitcher />
     </Container>
   );
 }

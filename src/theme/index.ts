@@ -179,8 +179,8 @@ const themeOptions: Record<keyof typeof THEMES, ThemeOptions> = {
   }
 };
 
-export const useCustomTheme = () => {
-  let theme = themeOptions[THEMES.LIGHT];
+export const useCustomTheme = (mode: keyof typeof THEMES) => {
+  let theme = themeOptions[mode];
 
   if (!theme) {
     console.warn('unknown theme was given');
