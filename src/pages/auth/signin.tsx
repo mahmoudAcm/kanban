@@ -38,7 +38,10 @@ function SignIn() {
       >
         Don’t have an account?{' '}
         <Box component='span' sx={{ position: 'relative', display: 'inline-block', marginBottom: '18px' }}>
-          <NextLink style={{ color: 'hsla(235, 12%, 27%, 1)', fontWeight: 600, cursor: 'pointer' }} href='/auth/signup'>
+          <NextLink
+            style={{ color: 'hsla(235, 12%, 27%, 1)', fontWeight: 600, cursor: 'pointer', textDecoration: 'none' }}
+            href='/auth/signup'
+          >
             Sign up for free
           </NextLink>
           <svg

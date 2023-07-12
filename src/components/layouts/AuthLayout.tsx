@@ -181,7 +181,8 @@ export default function AuthLayout(props: AuthLayoutProps) {
           sx={{
             background: '#F4F7FD',
             display: 'grid',
-            gridTemplateColumns: 'minmax(905px, 1fr)',
+            gridTemplateColumns: 'minmax(50vw, 1fr)',
+            alignItems: 'center',
             '& img': {
               userSelect: 'none'
             }
@@ -189,9 +190,9 @@ export default function AuthLayout(props: AuthLayoutProps) {
         >
           <Box
             sx={{
-              marginTop: '10.61%',
-              marginBottom: '8.2082%',
-              marginLeft: '10.765%',
+              paddingTop: '10.61%',
+              paddingBottom: '8.2082%',
+              paddingLeft: '10.765%',
               position: 'relative'
             }}
           >
