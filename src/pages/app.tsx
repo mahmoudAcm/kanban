@@ -2,13 +2,15 @@ import MainLayout from '@/src/components/layouts/MainLayout';
 import { ReactNode } from 'react';
 import { Box } from '@mui/material';
 import Head from 'next/head';
+import EmptyBoard from '@/src/components/EmptyBoard';
 
 function App() {
   return (
-    <Box>
+    <Box sx={{ height: '100%' }}>
       <Head>
         <title>App</title>
       </Head>
+      <EmptyBoard />
     </Box>
   );
 }
