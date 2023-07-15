@@ -106,7 +106,7 @@ export default function TaskDialog() {
                             helperText={props.errors.subtasks?.[index]}
                           />
                           <IconButton
-                            sx={{ mt: index === 0 ? '16px' : 0, mr: '-8px' }}
+                            sx={{ mt: index === 0 ? '16px' : 0, mr: '-8px', '&:hover rect': { fill: 'var(--red)' } }}
                             onClick={() => {
                               arrayHelpers.remove(index);
                             }}
