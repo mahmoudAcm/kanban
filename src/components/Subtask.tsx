@@ -68,7 +68,8 @@ export default function Subtask(props: SubtaskProps) {
         sx={{
           opacity: checked ? 0.5 : 1,
           textDecorationLine: checked ? 'line-through' : undefined,
-          color: theme => (theme.palette.__mode === 'DARK' ? theme.palette.common.white : theme.palette.common.black)
+          color: theme => (theme.palette.__mode === 'DARK' ? theme.palette.common.white : theme.palette.common.black),
+          py: '9px'
         }}
       >
         {props.title}

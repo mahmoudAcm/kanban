@@ -6,6 +6,7 @@ import EmptyBoard from '@/src/components/EmptyBoard';
 import BoardDialog from '@/src/components/BoardDialog';
 import TaskDialog from '@/src/components/TaskDialog';
 import Board from '@/src/components/Board';
+import ViewTaskDetailsDialog from '@/src/components/ViewTaskDetailsDialog';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       {/*<BoardDialog />*/}
       {/*<TaskDialog />*/}
       <Board />
+      <ViewTaskDetailsDialog />
     </Box>
   );
 }
