@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import Head from 'next/head';
 import EmptyBoard from '@/src/components/EmptyBoard';
 import BoardDialog from '@/src/components/BoardDialog';
+import TaskDialog from '@/src/components/TaskDialog';
 
 function App() {
   return (
@@ -12,7 +13,8 @@ function App() {
         <title>App</title>
       </Head>
       <EmptyBoard />
-      <BoardDialog />
+      {/*<BoardDialog />*/}
+      <TaskDialog />
     </Box>
   );
 }
