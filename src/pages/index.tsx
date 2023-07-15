@@ -5,6 +5,7 @@ import TextField from '@/src/components/inputs/TextField';
 import DropDown from '@/src/components/inputs/DropDown';
 import { MouseEventHandler, useState } from 'react';
 import ThemeSwitcher from '@/src/components/ThemeSwitcher';
+import Subtask from '@/src/components/Subtask';
 
 function Home() {
   const [selectValue, setSelectValue] = useState('Doing');
@@ -92,6 +93,10 @@ function Home() {
         </DropDown>
       </Box>
       <ThemeSwitcher />
+      <Box sx={{ py: '50px', background: 'white', p: 2, display: 'grid', gap: '16px' }}>
+        <Subtask title='Idle' />
+        <Subtask title='Completed' checked />
+      </Box>
     </Container>
   );
 }
