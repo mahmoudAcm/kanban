@@ -5,16 +5,18 @@ import Head from 'next/head';
 import EmptyBoard from '@/src/components/EmptyBoard';
 import BoardDialog from '@/src/components/BoardDialog';
 import TaskDialog from '@/src/components/TaskDialog';
+import Board from '@/src/components/Board';
 
 function App() {
   return (
-    <Box sx={{ height: '100%' }}>
+    <Box>
       <Head>
         <title>App</title>
       </Head>
-      <EmptyBoard />
+      {/*<EmptyBoard />*/}
       {/*<BoardDialog />*/}
-      <TaskDialog />
+      {/*<TaskDialog />*/}
+      <Board />
     </Box>
   );
 }
