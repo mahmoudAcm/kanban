@@ -12,7 +12,7 @@ const Input = styled(Select)(({ theme }) => ({
   padding: 0,
   ...theme.typography.body1,
   '& .MuiSelect-select': {
-    padding: '8px 16px 9px',
+    padding: '7.2px 15.2px 8.2px',
     height: 'auto',
     color: theme.palette.__mode === 'DARK' ? theme.palette.common.white : theme.palette.common.black
   },

@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { Box } from '@mui/material';
 import Head from 'next/head';
 import EmptyBoard from '@/src/components/EmptyBoard';
+import BoardDialog from '@/src/components/BoardDialog';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <title>App</title>
       </Head>
       <EmptyBoard />
+      <BoardDialog />
     </Box>
   );
 }

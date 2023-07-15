@@ -12,7 +12,7 @@ const Input = styled(InputBase)(({ theme }) => ({
   padding: 0,
   ...theme.typography.body1,
   '& input, & textarea': {
-    padding: '8px 16px 9px',
+    padding: '7.2px 15.2px 8.2px',
     height: 'auto',
     color: theme.palette.__mode === 'DARK' ? theme.palette.common.white : theme.palette.common.black
   },
@@ -25,17 +25,17 @@ const Input = styled(InputBase)(({ theme }) => ({
     borderColor: 'var(--red)',
     '& .MuiInputAdornment-root ': {
       marginLeft: 0,
+      userSelect: 'none',
       '& .MuiTypography-root': {
         color: 'var(--red)',
-        background: theme.palette.background.default,
-        paddingRight: 16
+        paddingRight: 15.2
       }
     }
   }
 }));
 
 interface TextFieldProps extends Omit<InputBaseProps, 'endAdornment'> {
-  label: string;
+  label?: string;
   helperText?: ReactNode | string;
 }
 
@@ -45,7 +45,7 @@ export default function TextField(props: TextFieldProps) {
 
   return (
     <FormControl sx={{ gap: '8px', ...sx }} fullWidth={fullWidth} error={error}>
-      <Label htmlFor={id}>{label}</Label>
+      {label && <Label htmlFor={id}>{label}</Label>}
       <Input
         id={id}
         placeholder={placeholder}

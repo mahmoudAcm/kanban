@@ -125,6 +125,53 @@ const baseOptions: ThemeOptions = {
           };
         }
       }
+    },
+    MuiDialog: {
+      defaultProps: {
+        maxWidth: 'xs'
+      },
+      styleOverrides: {
+        root: ({ theme, ownerState }) => {
+          return {
+            '& .MuiPaper-root': {
+              maxWidth: ownerState.maxWidth === 'xs' ? 480 : undefined,
+              boxShadow: 'none',
+              borderRadius: 6,
+              [theme.breakpoints.down('sm')]: {
+                margin: 16,
+                width: 'calc(100% - 32px)'
+              }
+            }
+          };
+        }
+      }
+    },
+    MuiDialogTitle: {
+      defaultProps: {
+        component: 'div'
+      },
+      styleOverrides: {
+        root: ({ theme }) => {
+          return {
+            padding: '32px 32px 0',
+            [theme.breakpoints.down('sm')]: {
+              padding: '24px 24px 0'
+            }
+          };
+        }
+      }
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: ({ theme }) => {
+          return {
+            padding: '0 32px 32px',
+            [theme.breakpoints.down('sm')]: {
+              padding: '0 24px 24px'
+            }
+          };
+        }
+      }
     }
   }
 };
@@ -147,6 +194,13 @@ const themeOptions: Record<keyof typeof THEMES, ThemeOptions> = {
           containedSecondary: {
             background: 'white !important',
             color: 'var(--main-purple)'
+          }
+        }
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            background: 'var(--dark-grey)'
           }
         }
       }
@@ -172,6 +226,13 @@ const themeOptions: Record<keyof typeof THEMES, ThemeOptions> = {
             '&:hover': {
               background: 'hsla(var(--main-purple-alpha), 0.25)'
             }
+          }
+        }
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            background: 'white'
           }
         }
       }
