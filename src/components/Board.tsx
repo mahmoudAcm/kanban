@@ -14,15 +14,35 @@ const BoardRoot = styled(Box)(({ theme }) => ({
   }
 }));
 
+const Status = styled(Typography)(() => ({
+  color: 'var(--medium-grey)',
+  display: 'flex'
+}));
+
 const Column = styled(Box)(() => ({
   display: 'grid',
   gap: 24,
   alignContent: 'start'
 }));
 
-const Status = styled(Typography)(() => ({
-  color: 'var(--medium-grey)',
-  display: 'flex'
+const AddNewColumnButton = styled(Box)(({ theme }) => ({
+  marginTop: 39,
+  background:
+    theme.palette.__mode === 'DARK'
+      ? 'linear-gradient(180deg, rgba(43, 44, 55, 0.25) 0%, rgba(43, 44, 55, 0.13) 100%)'
+      : 'linear-gradient(180deg, #E9EFFA 0%, rgba(233, 239, 250, 0.50) 100%)',
+  width: 280,
+  borderRadius: 6,
+  display: 'grid',
+  placeItems: 'center',
+  userSelect: 'none',
+  '& h1': {
+    transition: theme.transitions.create('color')
+  },
+  '&:hover h1': {
+    color: 'var(--main-purple)',
+    cursor: 'pointer'
+  }
 }));
 
 export default function Board() {
@@ -49,6 +69,11 @@ export default function Board() {
           </Box>
         </Column>
       ))}
+      <AddNewColumnButton role='button' aria-label='Add New Column'>
+        <Typography variant='h1' color='var(--medium-grey)'>
+          + New Column
+        </Typography>
+      </AddNewColumnButton>
     </BoardRoot>
   );
 }

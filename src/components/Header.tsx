@@ -25,7 +25,8 @@ const BoardName = styled(NextLink)(({ theme }) => ({
     display: 'inline-block',
     overflow: 'hidden',
     whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
+    transition: theme.transitions.create('color')
   },
   '& svg': {
     display: 'none'

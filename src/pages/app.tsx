@@ -17,8 +17,8 @@ function App() {
       {/*<EmptyBoard />*/}
       {/*<BoardDialog />*/}
       {/*<TaskDialog />*/}
+      {/*<ViewTaskDetailsDialog />*/}
       <Board />
-      <ViewTaskDetailsDialog />
     </Box>
   );
 }

@@ -32,8 +32,11 @@ const ProfileCardRoot = styled(Box)(({ theme }) => ({
   }
 }));
 
-const StyledTypography = styled(Typography)(() => ({
-  ...robotoFont.style
+const StyledTypography = styled(Typography)(({ theme }) => ({
+  ...robotoFont.style,
+  '&.name': {
+    transition: theme.transitions.create('color')
+  }
 }));
 
 export default function ProfileCard() {
@@ -107,7 +110,7 @@ export default function ProfileCard() {
       >
         <Avatar src='/images/profile.svg' sx={{ width: '38px', height: '38px' }} alt='' />
         <Box sx={{ display: 'grid', gap: '5px', flex: 1, userSelect: 'none' }}>
-          <StyledTypography sx={{ fontSize: '0.8125rem', lineHeight: 15 / 13, fontWeight: 600 }}>
+          <StyledTypography sx={{ fontSize: '0.8125rem', lineHeight: 15 / 13, fontWeight: 600 }} className='name'>
             Mahmoud Tarek
           </StyledTypography>
           <StyledTypography sx={{ fontSize: '0.75rem', lineHeight: 15 / 12, color: 'var(--medium-grey)' }}>
