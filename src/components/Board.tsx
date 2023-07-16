@@ -3,10 +3,10 @@ import Task, { getTasksProps } from '@/src/components/Task';
 import data from '@/src/data.json';
 
 const BoardRoot = styled(Box)(({ theme }) => ({
-  minHeight: 400,
+  width: '100%',
+  minHeight: '100%',
   overflowX: 'auto',
   padding: 24,
-  minWidth: '100%',
   display: 'flex',
   gap: 24,
   [theme.breakpoints.down('sm')]: {
@@ -20,6 +20,8 @@ const Status = styled(Typography)(() => ({
 }));
 
 const Column = styled(Box)(() => ({
+  minWidth: 280,
+  maxWidth: 280,
   display: 'grid',
   gap: 24,
   alignContent: 'start'
@@ -31,7 +33,8 @@ const AddNewColumnButton = styled(Box)(({ theme }) => ({
     theme.palette.__mode === 'DARK'
       ? 'linear-gradient(180deg, rgba(43, 44, 55, 0.25) 0%, rgba(43, 44, 55, 0.13) 100%)'
       : 'linear-gradient(180deg, #E9EFFA 0%, rgba(233, 239, 250, 0.50) 100%)',
-  width: 280,
+  minWidth: 280,
+  maxWidth: 280,
   borderRadius: 6,
   display: 'grid',
   placeItems: 'center',

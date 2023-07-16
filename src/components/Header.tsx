@@ -1,7 +1,8 @@
-import { AppBar, Button, IconButton, styled, Toolbar } from '@mui/material';
+import { AppBar, Button, IconButton, Menu, MenuItem, styled, Toolbar, useTheme } from '@mui/material';
 import PlusIcon from '@/src/icons/PlusIcon';
 import VerticalDotsIcon from '@/src/icons/VerticalDotsIcon';
 import NextLink from 'next/link';
+import { useState } from 'react';
 
 const Logo = styled('svg')(({ theme }) => ({
   display: 'none',
@@ -104,7 +105,12 @@ const BoardMenuButton = styled(IconButton)(({ theme }) => ({
 }));
 
 export default function Header() {
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const boardName = new Array(30).fill('Platform Launch').join(' ');
+
+  const open = Boolean(anchorEl);
+
   return (
     <AppBar
       position='sticky'
@@ -132,10 +138,47 @@ export default function Header() {
           <span className='text'>+ Add New Task</span>
           <PlusIcon className='plus-icon' />
         </AddTaskButton>
-        <BoardMenuButton aria-label='Board Button'>
+        <BoardMenuButton
+          aria-label='Board Button'
+          onClick={event => {
+            setAnchorEl(event.currentTarget);
+          }}
+        >
           <VerticalDotsIcon sx={{ width: '20px !important' }} />
         </BoardMenuButton>
       </StyledToolbar>
+      <Menu
+        open={open}
+        anchorEl={anchorEl}
+        onClose={() => {
+          setAnchorEl(null);
+        }}
+        PaperProps={{
+          sx: {
+            width: '192px',
+            mt: '28px',
+            ml: '20px',
+            background: theme => (theme.palette.__mode === 'DARK' ? theme.palette.background.default : 'white'),
+            [theme.breakpoints.down('md')]: {
+              mt: '16px'
+            },
+            [theme.breakpoints.down('sm')]: {
+              mt: '9px'
+            }
+          }
+        }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
+        }}
+      >
+        <MenuItem>Edit Board</MenuItem>
+        <MenuItem sx={{ color: 'var(--red)' }}>Delete Board</MenuItem>
+      </Menu>
     </AppBar>
   );
 }

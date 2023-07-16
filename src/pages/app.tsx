@@ -10,7 +10,7 @@ import ViewTaskDetailsDialog from '@/src/components/ViewTaskDetailsDialog';
 
 function App() {
   return (
-    <Box>
+    <Box sx={{ height: '20%' }}>
       <Head>
         <title>App</title>
       </Head>
