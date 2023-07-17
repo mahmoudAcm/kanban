@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Box, Dialog, DialogContent, DialogTitle, IconButton, MenuItem, Typography } from '@mui/material';
+import { Box, Dialog, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import DropDown from '@/src/components/inputs/DropDown';
 import { Form, Formik } from 'formik';
 import Subtask from '@/src/components/Subtask';
@@ -7,6 +7,9 @@ import VerticalDotsIcon from '@/src/icons/VerticalDotsIcon';
 
 export default function ViewTaskDetailsDialog() {
   const [open, setOpen] = useState(true);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  const isMenuOpen = Boolean(anchorEl);
 
   return (
     <Dialog
@@ -20,7 +23,13 @@ export default function ViewTaskDetailsDialog() {
         <Typography variant='h2' sx={{ maxWidth: '387px' }}>
           Research pricing points of various competitors and trial different business models
         </Typography>
-        <IconButton aria-label='View Task Details Dialog Button' sx={{ mr: '-15.5px' }}>
+        <IconButton
+          aria-label='View Task Details Dialog Button'
+          sx={{ mr: '-15.5px' }}
+          onClick={event => {
+            setAnchorEl(event.currentTarget);
+          }}
+        >
           <VerticalDotsIcon sx={{ width: '20px !important' }} />
         </IconButton>
       </DialogTitle>
@@ -37,7 +46,9 @@ export default function ViewTaskDetailsDialog() {
           <Form>
             <DialogContent sx={{ mt: '24px', pb: '32px !important' }}>
               <Typography variant='body1' sx={{ color: 'var(--medium-grey)', mb: '24px' }}>
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 We know what we're planning to build for version one. Now we need to finalise the first pricing model
+                {/* eslint-disable-next-line react/no-unescaped-entities */}
                 we'll use. Keep iterating the subtasks until we have a coherent proposition.
               </Typography>
               <Box sx={{ my: '24px' }}>
@@ -65,6 +76,31 @@ export default function ViewTaskDetailsDialog() {
           </Form>
         )}
       </Formik>
+      <Menu
+        open={isMenuOpen}
+        anchorEl={anchorEl}
+        onClose={() => {
+          setAnchorEl(null);
+        }}
+        PaperProps={{
+          sx: {
+            width: '192px',
+            mt: '14px',
+            background: theme => (theme.palette.__mode === 'DARK' ? theme.palette.background.default : 'white')
+          }
+        }}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center'
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center'
+        }}
+      >
+        <MenuItem>Edit Task</MenuItem>
+        <MenuItem sx={{ color: 'var(--red)' }}>Delete Task</MenuItem>
+      </Menu>
     </Dialog>
   );
 }
