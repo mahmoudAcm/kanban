@@ -1,7 +1,7 @@
-import { Box, Button, styled, Typography } from '@mui/material';
-import BoardIcon from '@/src/icons/BoardIcon';
+import { Box, styled } from '@mui/material';
 import ProfileCard from '@/src/components/ProfileCard';
 import ThemeSwitcher from '@/src/components/ThemeSwitcher';
+import Navigation from '@/src/components/Navigation';
 
 const Logo = styled('svg')(({ theme }) => ({
   marginTop: 32.78,
@@ -23,84 +23,6 @@ const SidebarRoot = styled(Box)(({ theme }) => ({
   }
 }));
 
-const Nav = styled('nav')(({ theme }) => ({
-  '--nav-left': '32px',
-  marginTop: 54,
-  marginLeft: 'var(--nav-left)',
-  gridRow: 'span 1',
-  height: '100%',
-  [theme.breakpoints.down('md')]: {
-    '--nav-left': '24px'
-  }
-}));
-
-const List = styled('ul')(() => ({
-  margin: 0,
-  padding: 0,
-  listStyleType: 'none',
-  marginTop: 19
-}));
-
-const Item = styled('li')(({ theme }) => ({
-  ...theme.typography.h3,
-  color: 'var(--medium-grey)',
-  display: 'flex',
-  gap: 16,
-  alignItems: 'center',
-  minHeight: 19,
-  paddingLeft: 'var(--nav-left)',
-  paddingTop: 14,
-  paddingBottom: 15,
-  cursor: 'pointer',
-  userSelect: 'none',
-  position: 'relative',
-  isolation: 'isolate',
-  marginLeft: 'calc(var(--nav-left) * -1)',
-  marginRight: 24,
-  borderTopRightRadius: 100,
-  borderBottomRightRadius: 100,
-  transition: theme.transitions.create(['background', 'color'], {
-    duration: 150
-  }),
-  '&.active': {
-    background: 'var(--main-purple)',
-    color: 'white'
-  },
-  '&:hover': {
-    background: theme.palette.__mode === 'DARK' ? 'white' : 'hsla(var(--main-purple-alpha), 0.10000000149011612)',
-    color: 'var(--main-purple)'
-  },
-  [theme.breakpoints.down('md')]: {
-    marginRight: 20,
-    gap: 12
-  }
-}));
-
-const CreateNewBoardButton = styled(Button)(({ theme }) => ({
-  width: '100%',
-  ...theme.typography.h3,
-  color: 'var(--main-purple)',
-  paddingLeft: 'var(--nav-left)',
-  minHeight: 19,
-  paddingRight: 'calc(var(--nav-left) * 1.5)',
-  justifyContent: 'start',
-  paddingTop: 14,
-  paddingBottom: 15,
-  marginLeft: 'calc(var(--nav-left) * -1)',
-  marginRight: 24,
-  gap: 16,
-  borderRadius: 0,
-  borderTopRightRadius: 100,
-  borderBottomRightRadius: 100,
-  '& .MuiButton-startIcon': {
-    margin: 0
-  },
-  [theme.breakpoints.down('md')]: {
-    marginRight: 20,
-    gap: 12
-  }
-}));
-
 export default function Sidebar() {
   return (
     <SidebarRoot>
@@ -118,28 +40,7 @@ export default function Sidebar() {
         <rect opacity='0.75' x='9' y='1' width='6' height='25' rx='2' fill='#635FC7' />
         <rect opacity='0.5' x='18' y='1' width='6' height='25' rx='2' fill='#635FC7' />
       </Logo>
-      <Nav>
-        <Typography variant='h4' color='var(--medium-grey)'>
-          ALL BOARDS (3)
-        </Typography>
-        <List>
-          <Item className='active'>
-            <BoardIcon />
-            Platform Launch
-          </Item>
-          <Item>
-            <BoardIcon />
-            Marketing Plan
-          </Item>
-          <Item>
-            <BoardIcon />
-            Roadmap
-          </Item>
-        </List>
-        <CreateNewBoardButton startIcon={<BoardIcon />} variant='text'>
-          + Create New Board
-        </CreateNewBoardButton>
-      </Nav>
+      <Navigation />
       <Box sx={{ height: '100%', display: 'grid', gap: '21px', paddingBottom: '32px' }}>
         <ProfileCard />
         <ThemeSwitcher />

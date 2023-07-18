@@ -1,7 +1,7 @@
 import { Avatar, Box, Menu, MenuItem, styled, Typography } from '@mui/material';
 import { Roboto } from 'next/font/google';
 import HorizontalDotsIcon from '@/src/icons/HorizontalDotsIcon';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent, useId, useState } from 'react';
 
 const robotoFont = Roboto({
   weight: ['400', '700'],
@@ -40,6 +40,7 @@ const StyledTypography = styled(Typography)(({ theme }) => ({
 }));
 
 export default function ProfileCard() {
+  const id = useId();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -91,14 +92,14 @@ export default function ProfileCard() {
           }
         }}
         MenuListProps={{
-          'aria-labelledby': 'profile-button'
+          'aria-labelledby': id + 'profile-button'
         }}
       >
         <MenuItem onClick={handleClose}>Add an existing account</MenuItem>
         <MenuItem onClick={handleClose}>Log out @Mahmoud03066050</MenuItem>
       </Menu>
       <ProfileCardRoot
-        id='profile-button'
+        id={id + 'profile-button'}
         aria-controls={open ? 'basic-menu' : undefined}
         aria-haspopup='true'
         aria-expanded={open ? 'true' : undefined}

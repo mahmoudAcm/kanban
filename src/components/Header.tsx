@@ -3,6 +3,7 @@ import PlusIcon from '@/src/icons/PlusIcon';
 import VerticalDotsIcon from '@/src/icons/VerticalDotsIcon';
 import NextLink from 'next/link';
 import { useState } from 'react';
+import MobileNavigation from '@/src/components/MobileNavigation';
 
 const Logo = styled('svg')(({ theme }) => ({
   display: 'none',
@@ -106,6 +107,7 @@ const BoardMenuButton = styled(IconButton)(({ theme }) => ({
 
 export default function Header() {
   const theme = useTheme();
+  const [isNavigationOpen, setNavigationOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const boardName = new Array(30).fill('Platform Launch').join(' ');
 
@@ -128,9 +130,29 @@ export default function Header() {
           <rect opacity='0.75' x='9' width='6' height='25' rx='2' fill='#635FC7' />
           <rect opacity='0.5' x='18' width='6' height='25' rx='2' fill='#635FC7' />
         </Logo>
-        <BoardName href='' aria-label='Show Boards'>
+        <BoardName
+          href=''
+          aria-label='Show Boards'
+          id='mobile-navigation-button'
+          aria-controls={isNavigationOpen ? 'mobile-navigation' : undefined}
+          aria-haspopup='true'
+          aria-expanded={isNavigationOpen ? 'true' : undefined}
+          onClick={event => {
+            event.preventDefault();
+            setNavigationOpen(prevState => !prevState);
+          }}
+        >
           <span>{boardName}</span>
-          <svg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 9 7' fill='none'>
+          <svg
+            xmlns='http://www.w3.org/2000/svg'
+            width='11'
+            height='7'
+            viewBox='0 0 9 7'
+            fill='none'
+            style={{
+              transform: isNavigationOpen ? 'rotate(180deg)' : undefined
+            }}
+          >
             <path d='M1 1L5 5L9 1' stroke='#635FC7' strokeWidth='2' />
           </svg>
         </BoardName>
@@ -179,6 +201,12 @@ export default function Header() {
         <MenuItem>Edit Board</MenuItem>
         <MenuItem sx={{ color: 'var(--red)' }}>Delete Board</MenuItem>
       </Menu>
+      <MobileNavigation
+        open={isNavigationOpen}
+        onClose={() => {
+          setNavigationOpen(false);
+        }}
+      />
     </AppBar>
   );
 }
