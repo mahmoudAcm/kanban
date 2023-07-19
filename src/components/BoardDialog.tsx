@@ -1,20 +1,23 @@
 import { Box, Button, Dialog, DialogContent, DialogTitle, FormGroup, IconButton, Typography } from '@mui/material';
-import { useState } from 'react';
 import TextField from '@/src/components/inputs/TextField';
 import * as yup from 'yup';
 import { ArrayHelpers, FieldArray, Form, Formik } from 'formik';
 import CloseIcon from '@/src/icons/CloseIcon';
+import { useAppDispatch } from '@/src/store';
+import useDialogsSelector from '@/src/hooks/useDialogsSelector';
+import { DIALOG_IDS } from '@/src/constants';
+import { dialogsActions } from '@/src/slices/dialogs';
 
 const schema = yup.object({
   name: yup.string().required("Can't be blank"),
   columns: yup.array().of(yup.string().max(70, 'Must be at most 70 characters').required("Can't be blank"))
 });
 
-type DialogType = 'create' | 'edit' | undefined;
-
 export default function BoardDialog() {
-  const [open, setOpen] = useState(true);
-  const type = 'create' as DialogType;
+  const dispatch = useAppDispatch();
+  const {
+    [DIALOG_IDS.BOARD_DIALOG]: { show, type }
+  } = useDialogsSelector();
 
   const initialValues =
     type === 'create'
@@ -26,10 +29,10 @@ export default function BoardDialog() {
 
   return (
     <Dialog
-      open={open}
+      open={show}
       fullWidth
       onClose={() => {
-        setOpen(false);
+        dispatch(dialogsActions.closeDialog(DIALOG_IDS.BOARD_DIALOG));
       }}
     >
       <DialogTitle>
@@ -70,7 +73,11 @@ export default function BoardDialog() {
                             helperText={props.errors.columns?.[index]}
                           />
                           <IconButton
-                            sx={{ mt: index === 0 ? '16px' : 0, mr: '-8px', '&:hover rect': { fill: 'var(--red)' } }}
+                            sx={{
+                              mt: index === 0 ? '16px' : 0,
+                              mr: '-8px',
+                              '&:hover rect': { fill: 'var(--red)' }
+                            }}
                             onClick={() => {
                               arrayHelpers.remove(index);
                             }}

@@ -9,12 +9,15 @@ import {
   MenuItem,
   Typography
 } from '@mui/material';
-import { useState } from 'react';
 import { ArrayHelpers, FieldArray, Form, Formik } from 'formik';
 import * as yup from 'yup';
 import TextField from '@/src/components/inputs/TextField';
 import CloseIcon from '@/src/icons/CloseIcon';
 import DropDown from '@/src/components/inputs/DropDown';
+import { useAppDispatch } from '@/src/store';
+import useDialogsSelector from '@/src/hooks/useDialogsSelector';
+import { DIALOG_IDS } from '@/src/constants';
+import { dialogsActions } from '@/src/slices/dialogs';
 
 const schema = yup.object({
   title: yup.string().required("Can't be blank"),
@@ -23,11 +26,11 @@ const schema = yup.object({
   status: yup.string().required("Can't be blank")
 });
 
-type DialogType = 'create' | 'edit' | undefined;
-
 export default function TaskDialog() {
-  const [open, setOpen] = useState(true);
-  const type = 'edit' as DialogType;
+  const dispatch = useAppDispatch();
+  const {
+    [DIALOG_IDS.TASK_DIALOG]: { show, type }
+  } = useDialogsSelector();
 
   const initialValues =
     type === 'create'
@@ -46,10 +49,10 @@ export default function TaskDialog() {
 
   return (
     <Dialog
-      open={open}
+      open={show}
       fullWidth
       onClose={() => {
-        setOpen(false);
+        dispatch(dialogsActions.closeDialog(DIALOG_IDS.TASK_DIALOG));
       }}
     >
       <DialogTitle>
@@ -106,7 +109,11 @@ export default function TaskDialog() {
                             helperText={props.errors.subtasks?.[index]}
                           />
                           <IconButton
-                            sx={{ mt: index === 0 ? '16px' : 0, mr: '-8px', '&:hover rect': { fill: 'var(--red)' } }}
+                            sx={{
+                              mt: index === 0 ? '16px' : 0,
+                              mr: '-8px',
+                              '&:hover rect': { fill: 'var(--red)' }
+                            }}
                             onClick={() => {
                               arrayHelpers.remove(index);
                             }}

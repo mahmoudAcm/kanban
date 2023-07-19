@@ -4,19 +4,30 @@ import DropDown from '@/src/components/inputs/DropDown';
 import { Form, Formik } from 'formik';
 import Subtask from '@/src/components/Subtask';
 import VerticalDotsIcon from '@/src/icons/VerticalDotsIcon';
+import { useAppDispatch } from '@/src/store';
+import useDialogsSelector from '@/src/hooks/useDialogsSelector';
+import { DIALOG_IDS } from '@/src/constants';
+import { dialogsActions } from '@/src/slices/dialogs';
 
 export default function ViewTaskDetailsDialog() {
-  const [open, setOpen] = useState(true);
+  const {
+    [DIALOG_IDS.VIEW_TASK_DIALOG]: { show }
+  } = useDialogsSelector();
+  const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const isMenuOpen = Boolean(anchorEl);
 
+  const closeMenu = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Dialog
-      open={open}
+      open={show}
       fullWidth
       onClose={() => {
-        setOpen(false);
+        dispatch(dialogsActions.closeDialog(DIALOG_IDS.VIEW_TASK_DIALOG));
       }}
     >
       <DialogTitle sx={{ display: 'flex', gap: '8.5px', alignItems: 'center' }}>
@@ -79,9 +90,7 @@ export default function ViewTaskDetailsDialog() {
       <Menu
         open={isMenuOpen}
         anchorEl={anchorEl}
-        onClose={() => {
-          setAnchorEl(null);
-        }}
+        onClose={closeMenu}
         PaperProps={{
           sx: {
             width: '192px',
@@ -98,7 +107,14 @@ export default function ViewTaskDetailsDialog() {
           horizontal: 'center'
         }}
       >
-        <MenuItem>Edit Task</MenuItem>
+        <MenuItem
+          onClick={() => {
+            dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.TASK_DIALOG, type: 'edit' }));
+            closeMenu();
+          }}
+        >
+          Edit Task
+        </MenuItem>
         <MenuItem sx={{ color: 'var(--red)' }}>Delete Task</MenuItem>
       </Menu>
     </Dialog>

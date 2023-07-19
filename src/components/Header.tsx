@@ -4,6 +4,9 @@ import VerticalDotsIcon from '@/src/icons/VerticalDotsIcon';
 import NextLink from 'next/link';
 import { useState } from 'react';
 import MobileNavigation from '@/src/components/MobileNavigation';
+import { useAppDispatch } from '@/src/store';
+import { dialogsActions } from '@/src/slices/dialogs';
+import { DIALOG_IDS } from '@/src/constants';
 
 const Logo = styled('svg')(({ theme }) => ({
   display: 'none',
@@ -106,12 +109,17 @@ const BoardMenuButton = styled(IconButton)(({ theme }) => ({
 }));
 
 export default function Header() {
+  const dispatch = useAppDispatch();
   const theme = useTheme();
   const [isNavigationOpen, setNavigationOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const boardName = new Array(30).fill('Platform Launch').join(' ');
 
   const open = Boolean(anchorEl);
+
+  const closeMenu = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <AppBar
@@ -156,7 +164,13 @@ export default function Header() {
             <path d='M1 1L5 5L9 1' stroke='#635FC7' strokeWidth='2' />
           </svg>
         </BoardName>
-        <AddTaskButton size='large' aria-label='Add Task'>
+        <AddTaskButton
+          size='large'
+          aria-label='Add Task'
+          onClick={() => {
+            dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.TASK_DIALOG, type: 'create' }));
+          }}
+        >
           <span className='text'>+ Add New Task</span>
           <PlusIcon className='plus-icon' />
         </AddTaskButton>
@@ -172,9 +186,7 @@ export default function Header() {
       <Menu
         open={open}
         anchorEl={anchorEl}
-        onClose={() => {
-          setAnchorEl(null);
-        }}
+        onClose={closeMenu}
         PaperProps={{
           sx: {
             width: '192px',
@@ -198,7 +210,14 @@ export default function Header() {
           horizontal: 'right'
         }}
       >
-        <MenuItem>Edit Board</MenuItem>
+        <MenuItem
+          onClick={() => {
+            dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.BOARD_DIALOG, type: 'edit' }));
+            closeMenu();
+          }}
+        >
+          Edit Board
+        </MenuItem>
         <MenuItem sx={{ color: 'var(--red)' }}>Delete Board</MenuItem>
       </Menu>
       <MobileNavigation

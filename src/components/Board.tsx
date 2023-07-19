@@ -1,6 +1,9 @@
 import { Box, styled, Typography } from '@mui/material';
 import Task, { getTasksProps } from '@/src/components/Task';
 import data from '@/src/data.json';
+import { useAppDispatch } from '@/src/store';
+import { dialogsActions } from '@/src/slices/dialogs';
+import { DIALOG_IDS } from '@/src/constants';
 
 const BoardRoot = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -49,6 +52,8 @@ const AddNewColumnButton = styled(Box)(({ theme }) => ({
 }));
 
 export default function Board() {
+  const dispatch = useAppDispatch();
+
   return (
     <BoardRoot>
       {data.boards[0].columns.map((column, index) => (
@@ -73,7 +78,13 @@ export default function Board() {
         </Column>
       ))}
       <AddNewColumnButton role='button' aria-label='Add New Column'>
-        <Typography variant='h1' color='var(--medium-grey)'>
+        <Typography
+          variant='h1'
+          color='var(--medium-grey)'
+          onClick={() => {
+            dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.BOARD_DIALOG, type: 'edit' }));
+          }}
+        >
           + New Column
         </Typography>
       </AddNewColumnButton>

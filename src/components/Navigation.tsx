@@ -1,5 +1,8 @@
 import { Button, styled, Typography } from '@mui/material';
 import BoardIcon from '@/src/icons/BoardIcon';
+import { useAppDispatch } from '@/src/store';
+import { dialogsActions } from '@/src/slices/dialogs';
+import { DIALOG_IDS } from '@/src/constants';
 
 export const Nav = styled('nav')(({ theme }) => ({
   '--nav-left': '32px',
@@ -79,6 +82,8 @@ export const CreateNewBoardButton = styled(Button)(({ theme }) => ({
   }
 }));
 export default function Navigation() {
+  const dispatch = useAppDispatch();
+
   return (
     <Nav className='Navigation'>
       <Typography variant='h4' color='var(--medium-grey)' className='Navigation-header'>
@@ -98,7 +103,14 @@ export default function Navigation() {
           Roadmap
         </Item>
       </List>
-      <CreateNewBoardButton startIcon={<BoardIcon />} variant='text' className='Navigation-createNewBoard'>
+      <CreateNewBoardButton
+        startIcon={<BoardIcon />}
+        variant='text'
+        className='Navigation-createNewBoard'
+        onClick={() => {
+          dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.BOARD_DIALOG, type: 'create' }));
+        }}
+      >
         + Create New Board
       </CreateNewBoardButton>
     </Nav>

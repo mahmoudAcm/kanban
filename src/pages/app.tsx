@@ -15,9 +15,9 @@ function App() {
         <title>App</title>
       </Head>
       {/*<EmptyBoard />*/}
-      {/*<BoardDialog />*/}
-      {/*<TaskDialog />*/}
-      {/*<ViewTaskDetailsDialog />*/}
+      <BoardDialog />
+      <ViewTaskDetailsDialog />
+      <TaskDialog />
       <Board />
     </Box>
   );

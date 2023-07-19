@@ -1,4 +1,7 @@
 import { Box, Typography } from '@mui/material';
+import { useAppDispatch } from '@/src/store';
+import { dialogsActions } from '@/src/slices/dialogs';
+import { DIALOG_IDS } from '@/src/constants';
 
 export const getTasksProps = (task: {
   title: string;
@@ -21,6 +24,8 @@ interface TaskProps {
 }
 
 export default function Task(props: TaskProps) {
+  const dispatch = useAppDispatch();
+
   return (
     <Box
       sx={{
@@ -37,9 +42,16 @@ export default function Task(props: TaskProps) {
         '&:hover h3': { color: 'var(--main-purple)', cursor: 'pointer' }
       }}
     >
-      <Typography variant='h3'>{props.title}</Typography>
+      <Typography
+        variant='h3'
+        onClick={() => {
+          dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.VIEW_TASK_DIALOG }));
+        }}
+      >
+        {props.title}
+      </Typography>
       <Typography variant='body2' sx={{ mt: '8px', color: 'var(--medium-grey)' }}>
-        {`${props.completedSubtasksCount} of ${props.subtasksCount} substasks`}
+        {`${props.completedSubtasksCount} of ${props.subtasksCount} subtasks`}
       </Typography>
     </Box>
   );

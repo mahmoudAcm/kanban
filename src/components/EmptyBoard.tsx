@@ -1,4 +1,7 @@
 import { Box, Button, styled, Typography } from '@mui/material';
+import { useAppDispatch } from '@/src/store';
+import { dialogsActions } from '@/src/slices/dialogs';
+import { DIALOG_IDS } from '@/src/constants';
 
 const EmptyBoardRoot = styled(Box)(({ theme }) => ({
   display: 'grid',
@@ -26,12 +29,20 @@ const StyledTypography = styled(Typography)(({ theme }) => ({
 }));
 
 export default function EmptyBoard() {
+  const dispatch = useAppDispatch();
+
   return (
     <EmptyBoardRoot>
       <StyledTypography variant='h2' sx={{ color: 'var(--medium-grey)', textAlign: 'center' }}>
         This board is empty. Create a new column to get started.
       </StyledTypography>
-      <Button size='large' sx={{ paddingLeft: '17px', paddingRight: '18px', width: 'fit-content' }}>
+      <Button
+        size='large'
+        sx={{ paddingLeft: '17px', paddingRight: '18px', width: 'fit-content' }}
+        onClick={() => {
+          dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.BOARD_DIALOG, type: 'edit' }));
+        }}
+      >
         + Add New Column
       </Button>
     </EmptyBoardRoot>
