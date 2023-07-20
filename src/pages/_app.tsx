@@ -11,6 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { CustomThemeProvider } from '@/src/contexts/CustomThemeContext';
 import { Provider } from 'react-redux';
 import store from '@/src/store';
+import { PageLoadingProvider } from '@/src/contexts/PageLoadingContext';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -28,29 +29,31 @@ const App: FunctionComponent<AppProps> = props => {
 
   return (
     <CacheProvider value={emotionCache}>
-      <CustomThemeProvider>
-        <CssBaseline />
-        <Provider store={store}>
-          <Box
-            sx={{
-              '& .Toastify__toast-container': {
-                '@media (max-width: 487px)': {
-                  width: 'calc(100% - 2em)',
-                  top: '1em',
-                  left: '1em',
-                  right: '1em',
-                  '& .Toastify__toast': {
-                    marginBottom: '1rem'
+      <PageLoadingProvider>
+        <CustomThemeProvider>
+          <CssBaseline />
+          <Provider store={store}>
+            <Box
+              sx={{
+                '& .Toastify__toast-container': {
+                  '@media (max-width: 487px)': {
+                    width: 'calc(100% - 2em)',
+                    top: '1em',
+                    left: '1em',
+                    right: '1em',
+                    '& .Toastify__toast': {
+                      marginBottom: '1rem'
+                    }
                   }
                 }
-              }
-            }}
-          >
-            <ToastContainer limit={4} newestOnTop />
-          </Box>
-          {!authGuard && getLayout(<Component {...pageProps} />)}
-        </Provider>
-      </CustomThemeProvider>
+              }}
+            >
+              <ToastContainer limit={4} newestOnTop />
+            </Box>
+            {!authGuard && getLayout(<Component {...pageProps} />)}
+          </Provider>
+        </CustomThemeProvider>
+      </PageLoadingProvider>
     </CacheProvider>
   );
 };

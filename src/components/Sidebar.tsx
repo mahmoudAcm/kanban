@@ -2,8 +2,8 @@ import { Box, styled } from '@mui/material';
 import ProfileCard from '@/src/components/ProfileCard';
 import ThemeSwitcher from '@/src/components/ThemeSwitcher';
 import Navigation from '@/src/components/Navigation';
-import { useState } from 'react';
 import { ProfileCardSkeleton, ThemeSwitcherSkeleton } from '@/src/components/NavigationLoadingScreen';
+import usePageLoadingContext from '@/src/hooks/usePageLoadingContext';
 
 const Logo = styled('svg')(({ theme }) => ({
   marginTop: 32.78,
@@ -11,8 +11,10 @@ const Logo = styled('svg')(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
     marginLeft: 26
   },
-  '& rect, & path': {
-    fill: theme.palette.background.default
+  '&.Logo-pageLoading': {
+    '& rect, & path': {
+      fill: theme.palette.background.default
+    }
   }
 }));
 
@@ -29,12 +31,19 @@ const SidebarRoot = styled(Box)(({ theme }) => ({
 }));
 
 export default function Sidebar() {
-  const [pageLoading] = useState(true);
+  const { isPageLoading } = usePageLoadingContext();
 
   return (
     <SidebarRoot>
-      {pageLoading ? (
-        <Logo width='153' height='26' viewBox='0 0 153 26' fill='none' xmlns='http://www.w3.org/2000/svg'>
+      {isPageLoading ? (
+        <Logo
+          width='153'
+          height='26'
+          viewBox='0 0 153 26'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+          className={isPageLoading ? 'Logo-pageLoading' : undefined}
+        >
           <path
             fillRule='evenodd'
             clipRule='evenodd'
@@ -45,7 +54,14 @@ export default function Sidebar() {
           <rect opacity='0.5' x='18' y='1' width='6' height='25' rx='2' />
         </Logo>
       ) : (
-        <Logo width='153' height='26' viewBox='0 0 153 26' fill='none' xmlns='http://www.w3.org/2000/svg'>
+        <Logo
+          width='153'
+          height='26'
+          viewBox='0 0 153 26'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+          className={isPageLoading ? 'Logo-pageLoading' : undefined}
+        >
           <Box
             component='path'
             fillRule='evenodd'
@@ -62,7 +78,7 @@ export default function Sidebar() {
       )}
       <Navigation />
       <Box sx={{ height: '100%', display: 'grid', gap: '21px', paddingBottom: '32px' }}>
-        {pageLoading ? (
+        {isPageLoading ? (
           <>
             <ProfileCardSkeleton />
             <ThemeSwitcherSkeleton />

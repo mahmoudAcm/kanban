@@ -4,6 +4,10 @@ import VerticalDotsIcon from '@/src/icons/VerticalDotsIcon';
 import NextLink from 'next/link';
 import { useState } from 'react';
 import MobileNavigation from '@/src/components/MobileNavigation';
+import usePageLoadingContext from '@/src/hooks/usePageLoadingContext';
+import { useAppDispatch } from '@/src/store';
+import { dialogsActions } from '@/src/slices/dialogs';
+import { DIALOG_IDS } from '@/src/constants';
 
 const Logo = styled('svg')(({ theme }) => ({
   display: 'none',
@@ -11,8 +15,10 @@ const Logo = styled('svg')(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     display: 'block'
   },
-  '& rect, & path': {
-    fill: theme.palette.background.default
+  '&.Logo-pageLoading': {
+    '& rect, & path': {
+      fill: theme.palette.background.default
+    }
   }
 }));
 
@@ -109,13 +115,18 @@ const BoardMenuButton = styled(IconButton)(({ theme }) => ({
 }));
 
 export default function Header() {
+  const dispatch = useAppDispatch();
   const theme = useTheme();
   const [isNavigationOpen, setNavigationOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [pageLoading] = useState(true);
+  const { isPageLoading } = usePageLoadingContext();
   const boardName = new Array(30).fill('Platform Launch').join(' ');
 
   const open = Boolean(anchorEl);
+
+  const closeMenu = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <AppBar
@@ -129,13 +140,20 @@ export default function Header() {
       }}
     >
       <StyledToolbar>
-        <Logo width='24' height='25' viewBox='0 0 24 25' fill='none' xmlns='http://www.w3.org/2000/svg'>
+        <Logo
+          width='24'
+          height='25'
+          viewBox='0 0 24 25'
+          fill='none'
+          xmlns='http://www.w3.org/2000/svg'
+          className={isPageLoading ? 'Logo-pageLoading' : undefined}
+        >
           <rect width='6' height='25' rx='2' fill='#635FC7' />
           <rect opacity='0.75' x='9' width='6' height='25' rx='2' fill='#635FC7' />
           <rect opacity='0.5' x='18' width='6' height='25' rx='2' fill='#635FC7' />
         </Logo>
         <BoardName
-          sx={{ display: pageLoading ? 'none' : undefined }}
+          sx={{ display: isPageLoading ? 'none' : undefined }}
           href=''
           aria-label='Show Boards'
           id='mobile-navigation-button'
@@ -161,7 +179,14 @@ export default function Header() {
             <path d='M1 1L5 5L9 1' stroke='#635FC7' strokeWidth='2' />
           </svg>
         </BoardName>
-        <AddTaskButton size='large' aria-label='Add Task' disabled={pageLoading}>
+        <AddTaskButton
+          size='large'
+          aria-label='Add Task'
+          disabled={isPageLoading}
+          onClick={() => {
+            dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.TASK_DIALOG, type: 'create' }));
+          }}
+        >
           <span className='text'>+ Add New Task</span>
           <PlusIcon className='plus-icon' />
         </AddTaskButton>
@@ -170,7 +195,7 @@ export default function Header() {
           onClick={event => {
             setAnchorEl(event.currentTarget);
           }}
-          disabled={pageLoading}
+          disabled={isPageLoading}
         >
           <VerticalDotsIcon sx={{ width: '20px !important' }} />
         </BoardMenuButton>
@@ -204,7 +229,14 @@ export default function Header() {
           horizontal: 'right'
         }}
       >
-        <MenuItem>Edit Board</MenuItem>
+        <MenuItem
+          onClick={() => {
+            dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.BOARD_DIALOG, type: 'edit' }));
+            closeMenu();
+          }}
+        >
+          Edit Board
+        </MenuItem>
         <MenuItem sx={{ color: 'var(--red)' }}>Delete Board</MenuItem>
       </Menu>
       <MobileNavigation

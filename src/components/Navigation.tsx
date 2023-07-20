@@ -1,7 +1,7 @@
 import { Button, styled, Typography } from '@mui/material';
 import BoardIcon from '@/src/icons/BoardIcon';
-import { useState } from 'react';
 import { NavSkeleton } from '@/src/components/NavigationLoadingScreen';
+import usePageLoadingContext from '@/src/hooks/usePageLoadingContext';
 
 export const Nav = styled('nav')(({ theme }) => ({
   '--nav-left': '32px',
@@ -81,11 +81,11 @@ export const CreateNewBoardButton = styled(Button)(({ theme }) => ({
   }
 }));
 export default function Navigation() {
-  const [pageLoading] = useState(true);
+  const { isPageLoading } = usePageLoadingContext();
 
   return (
     <Nav className='Navigation'>
-      {pageLoading ? (
+      {isPageLoading ? (
         <NavSkeleton />
       ) : (
         <>

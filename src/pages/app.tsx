@@ -8,19 +8,21 @@ import TaskDialog from '@/src/components/TaskDialog';
 import Board from '@/src/components/Board';
 import ViewTaskDetailsDialog from '@/src/components/ViewTaskDetailsDialog';
 import BoardLoadingScreen from '@/src/components/Board/BoardLoadingScreen';
+import usePageLoadingContext from '@/src/hooks/usePageLoadingContext';
 
 function App() {
+  const { isPageLoading } = usePageLoadingContext();
+
   return (
     <Box sx={{ height: '20%' }}>
       <Head>
         <title>App</title>
       </Head>
       {/*<EmptyBoard />*/}
-      {/*<BoardDialog />*/}
-      {/*<TaskDialog />*/}
-      {/*<ViewTaskDetailsDialog />*/}
-      {/*<Board />*/}
-      <BoardLoadingScreen />
+      <BoardDialog />
+      <TaskDialog />
+      <ViewTaskDetailsDialog />
+      {isPageLoading ? <BoardLoadingScreen /> : <Board />}
     </Box>
   );
 }
