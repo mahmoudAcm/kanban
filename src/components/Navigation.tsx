@@ -1,8 +1,7 @@
 import { Button, styled, Typography } from '@mui/material';
 import BoardIcon from '@/src/icons/BoardIcon';
-import { useAppDispatch } from '@/src/store';
-import { dialogsActions } from '@/src/slices/dialogs';
-import { DIALOG_IDS } from '@/src/constants';
+import { useState } from 'react';
+import { NavSkeleton } from '@/src/components/NavigationLoadingScreen';
 
 export const Nav = styled('nav')(({ theme }) => ({
   '--nav-left': '32px',
@@ -82,37 +81,36 @@ export const CreateNewBoardButton = styled(Button)(({ theme }) => ({
   }
 }));
 export default function Navigation() {
-  const dispatch = useAppDispatch();
+  const [pageLoading] = useState(true);
 
   return (
     <Nav className='Navigation'>
-      <Typography variant='h4' color='var(--medium-grey)' className='Navigation-header'>
-        ALL BOARDS (3)
-      </Typography>
-      <List className='Navigation-list'>
-        <Item className='active Navigation-item'>
-          <BoardIcon />
-          Platform Launch
-        </Item>
-        <Item className='Navigation-item'>
-          <BoardIcon />
-          Marketing Plan
-        </Item>
-        <Item className='Navigation-item'>
-          <BoardIcon />
-          Roadmap
-        </Item>
-      </List>
-      <CreateNewBoardButton
-        startIcon={<BoardIcon />}
-        variant='text'
-        className='Navigation-createNewBoard'
-        onClick={() => {
-          dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.BOARD_DIALOG, type: 'create' }));
-        }}
-      >
-        + Create New Board
-      </CreateNewBoardButton>
+      {pageLoading ? (
+        <NavSkeleton />
+      ) : (
+        <>
+          <Typography variant='h4' color='var(--medium-grey)' className='Navigation-header'>
+            ALL BOARDS (3)
+          </Typography>
+          <List className='Navigation-list'>
+            <Item className='active Navigation-item'>
+              <BoardIcon />
+              Platform Launch
+            </Item>
+            <Item className='Navigation-item'>
+              <BoardIcon />
+              Marketing Plan
+            </Item>
+            <Item className='Navigation-item'>
+              <BoardIcon />
+              Roadmap
+            </Item>
+          </List>
+          <CreateNewBoardButton startIcon={<BoardIcon />} variant='text' className='Navigation-createNewBoard'>
+            + Create New Board
+          </CreateNewBoardButton>
+        </>
+      )}
     </Nav>
   );
 }

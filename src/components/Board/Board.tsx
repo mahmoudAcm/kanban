@@ -5,7 +5,7 @@ import { useAppDispatch } from '@/src/store';
 import { dialogsActions } from '@/src/slices/dialogs';
 import { DIALOG_IDS } from '@/src/constants';
 
-const BoardRoot = styled(Box)(({ theme }) => ({
+export const BoardRoot = styled(Box)(({ theme }) => ({
   width: '100%',
   minHeight: '100%',
   overflowX: 'auto',
@@ -17,12 +17,12 @@ const BoardRoot = styled(Box)(({ theme }) => ({
   }
 }));
 
-const Status = styled(Typography)(() => ({
+export const Status = styled(Typography)(() => ({
   color: 'var(--medium-grey)',
   display: 'flex'
 }));
 
-const Column = styled(Box)(() => ({
+export const Column = styled(Box)(() => ({
   minWidth: 280,
   maxWidth: 280,
   display: 'grid',
@@ -30,7 +30,7 @@ const Column = styled(Box)(() => ({
   alignContent: 'start'
 }));
 
-const AddNewColumnButton = styled(Box)(({ theme }) => ({
+export const AddNewColumnButton = styled(Box)(({ theme }) => ({
   marginTop: 39,
   background:
     theme.palette.__mode === 'DARK'
