@@ -23,6 +23,7 @@ interface TaskProps {
 export default function Task(props: TaskProps) {
   return (
     <Box
+      className='Task'
       sx={{
         width: '280px',
         p: '23px 16px',

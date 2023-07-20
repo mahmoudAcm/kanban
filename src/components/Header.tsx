@@ -10,6 +10,9 @@ const Logo = styled('svg')(({ theme }) => ({
   marginRight: 16,
   [theme.breakpoints.down('sm')]: {
     display: 'block'
+  },
+  '& rect, & path': {
+    fill: theme.palette.background.default
   }
 }));
 
@@ -109,6 +112,7 @@ export default function Header() {
   const theme = useTheme();
   const [isNavigationOpen, setNavigationOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [pageLoading] = useState(true);
   const boardName = new Array(30).fill('Platform Launch').join(' ');
 
   const open = Boolean(anchorEl);
@@ -131,6 +135,7 @@ export default function Header() {
           <rect opacity='0.5' x='18' width='6' height='25' rx='2' fill='#635FC7' />
         </Logo>
         <BoardName
+          sx={{ display: pageLoading ? 'none' : undefined }}
           href=''
           aria-label='Show Boards'
           id='mobile-navigation-button'
@@ -156,7 +161,7 @@ export default function Header() {
             <path d='M1 1L5 5L9 1' stroke='#635FC7' strokeWidth='2' />
           </svg>
         </BoardName>
-        <AddTaskButton size='large' aria-label='Add Task'>
+        <AddTaskButton size='large' aria-label='Add Task' disabled={pageLoading}>
           <span className='text'>+ Add New Task</span>
           <PlusIcon className='plus-icon' />
         </AddTaskButton>
@@ -165,6 +170,7 @@ export default function Header() {
           onClick={event => {
             setAnchorEl(event.currentTarget);
           }}
+          disabled={pageLoading}
         >
           <VerticalDotsIcon sx={{ width: '20px !important' }} />
         </BoardMenuButton>

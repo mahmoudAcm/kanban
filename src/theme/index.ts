@@ -60,6 +60,7 @@ const baseOptions: ThemeOptions = {
           '--red': 'hsl(0, 78%, 63%)',
           '--red-hover': 'hsl(0, 100%, 80%)',
 
+          '--white-alpha': '0, 0%, 100%',
           '--main-purple-alpha': '242, 48%, 58%',
           '--main-purple-hover-alpha': '242, 100%, 82%',
           '--dark-grey-alpha': '235, 12%, 19%',
@@ -191,6 +192,12 @@ const themeOptions: Record<keyof typeof THEMES, ThemeOptions> = {
     components: {
       MuiButton: {
         styleOverrides: {
+          root: {
+            '&.Mui-disabled': {
+              color: 'hsla(var(--white-alpha), 0.25)',
+              background: 'hsla(var(--main-purple-alpha), 0.25)'
+            }
+          },
           containedSecondary: {
             background: 'white !important',
             color: 'var(--main-purple)'
@@ -220,6 +227,12 @@ const themeOptions: Record<keyof typeof THEMES, ThemeOptions> = {
     components: {
       MuiButton: {
         styleOverrides: {
+          root: {
+            '&.Mui-disabled': {
+              color: 'white',
+              background: 'hsla(var(--main-purple-alpha), 0.25)'
+            }
+          },
           containedSecondary: {
             background: 'hsla(var(--main-purple-alpha), 0.10)',
             color: 'var(--main-purple)',
