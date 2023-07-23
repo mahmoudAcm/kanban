@@ -7,6 +7,8 @@ import { useAppDispatch } from '@/src/store';
 import useDialogsSelector from '@/src/hooks/useDialogsSelector';
 import { DIALOG_IDS } from '@/src/constants';
 import { dialogsActions } from '@/src/slices/dialogs';
+import { boardsActions } from '@/src/slices/boards';
+import useBoardsSelector from '@/src/hooks/useBoardsSelector';
 
 const schema = yup.object({
   name: yup.string().required("Can't be blank"),
@@ -18,13 +20,17 @@ export default function BoardDialog() {
   const {
     [DIALOG_IDS.BOARD_DIALOG]: { show, type }
   } = useDialogsSelector();
+  const boards = useBoardsSelector<'boards'>(({ boards }) => boards);
+  const activeBoardId = useBoardsSelector<'activeBoardId'>(({ activeBoardId }) => activeBoardId);
+
+  const board = boards[activeBoardId];
 
   const initialValues =
     type === 'create'
       ? { name: '', columns: ['Todo', 'Doing'] }
       : {
-          name: 'Platform Launch',
-          columns: ['Todo', 'Doing', 'Done']
+          name: board.name,
+          columns: board.columns.map(({ name }) => name)
         };
 
   return (
@@ -41,8 +47,15 @@ export default function BoardDialog() {
       <Formik
         initialValues={initialValues}
         validationSchema={schema}
-        onSubmit={(values, actions) => {
-          console.log(values);
+        onSubmit={async (values, actions) => {
+          if (type === 'create')
+            await dispatch(
+              boardsActions.apiAddBoard({
+                ...values,
+                columns: values.columns.map(column => ({ name: column }))
+              })
+            );
+          // console.log(values);
         }}
       >
         {props => (

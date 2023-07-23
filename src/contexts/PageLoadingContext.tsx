@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useEffect, useRef, useState } from 'react';
+import useBoardsSelector from '@/src/hooks/useBoardsSelector';
 
 export const PageLoadingContext = createContext({
   isPageLoading: true
@@ -7,6 +8,7 @@ export const PageLoadingContext = createContext({
 export function PageLoadingProvider({ children }: { children: ReactNode }) {
   const [isPageLoading, setPageLoading] = useState(true);
   const timeoutRef = useRef<any | null>(null);
+  const isBoardsReady = useBoardsSelector<'isBoardsReady'>(__boards => __boards.isBoardsReady);
 
   useEffect(() => {
     timeoutRef.current = setTimeout(() => {
@@ -17,5 +19,9 @@ export function PageLoadingProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  return <PageLoadingContext.Provider value={{ isPageLoading }}>{children}</PageLoadingContext.Provider>;
+  return (
+    <PageLoadingContext.Provider value={{ isPageLoading: isPageLoading || !isBoardsReady }}>
+      {children}
+    </PageLoadingContext.Provider>
+  );
 }

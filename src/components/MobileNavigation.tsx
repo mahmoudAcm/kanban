@@ -40,7 +40,7 @@ export default function MobileNavigation({ open, onClose }: MobileNavigationProp
         }
       }}
     >
-      <Navigation />
+      <Navigation onMobileNavigationClose={onClose} />
       <Box sx={{ height: '100%', display: 'grid', gap: '16px', paddingBottom: '16px', mt: '26px' }}>
         <ProfileCard />
         <ThemeSwitcher />

@@ -8,15 +8,26 @@ import { useAppDispatch } from '@/src/store';
 import useDialogsSelector from '@/src/hooks/useDialogsSelector';
 import { DIALOG_IDS } from '@/src/constants';
 import { dialogsActions } from '@/src/slices/dialogs';
+import useTasksSelector from '@/src/hooks/useTasksSelector';
+import useBoardsSelector from '@/src/hooks/useBoardsSelector';
+import { getTasksProps } from '@/src/components/Task';
 
 export default function ViewTaskDetailsDialog() {
   const {
     [DIALOG_IDS.VIEW_TASK_DIALOG]: { show }
   } = useDialogsSelector();
+  const boards = useBoardsSelector<'boards'>(({ boards }) => boards);
+  const activeBoardId = useBoardsSelector<'activeBoardId'>(({ activeBoardId }) => activeBoardId);
+  const { activeTaskId, tasks } = useTasksSelector();
   const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
+  if (!activeTaskId) return <></>;
+
   const isMenuOpen = Boolean(anchorEl);
+  const board = boards[activeBoardId];
+  const task = tasks[activeTaskId];
+  const taskProps = getTasksProps(task);
 
   const closeMenu = () => {
     setAnchorEl(null);
@@ -31,8 +42,8 @@ export default function ViewTaskDetailsDialog() {
       }}
     >
       <DialogTitle sx={{ display: 'flex', gap: '8.5px', alignItems: 'center' }}>
-        <Typography variant='h2' sx={{ maxWidth: '387px' }}>
-          Research pricing points of various competitors and trial different business models
+        <Typography variant='h2' sx={{ maxWidth: '387px', flex: 1 }}>
+          {task?.title}
         </Typography>
         <IconButton
           aria-label='View Task Details Dialog Button'
@@ -56,32 +67,31 @@ export default function ViewTaskDetailsDialog() {
         {props => (
           <Form>
             <DialogContent sx={{ mt: '24px', pb: '32px !important' }}>
-              <Typography variant='body1' sx={{ color: 'var(--medium-grey)', mb: '24px' }}>
-                {/* eslint-disable-next-line react/no-unescaped-entities */}
-                We know what we're planning to build for version one. Now we need to finalise the first pricing model
-                {/* eslint-disable-next-line react/no-unescaped-entities */}
-                we'll use. Keep iterating the subtasks until we have a coherent proposition.
-              </Typography>
+              {task?.description && (
+                <Typography variant='body1' sx={{ color: 'var(--medium-grey)', mb: '24px' }}>
+                  {task.description}
+                </Typography>
+              )}
               <Box sx={{ my: '24px' }}>
                 <Typography variant='body2' sx={{ color: 'var(--medium-grey)' }}>
-                  Subtasks (2 of 3)
+                  Subtasks ({taskProps.completedSubtasksCount} of {taskProps.subtasksCount})
                 </Typography>
                 <Box sx={{ display: 'grid', gap: '8px', mt: '16px' }}>
-                  <Subtask title='Research competitor pricing and business models' checked />
-                  <Subtask title='Outline a business model that works for our solution' checked />
-                  <Subtask title='Talk to potential customers about our proposed solution and ask for fair price expectancy' />
+                  {task?.subtasks.map(subtask => (
+                    <Subtask key={subtask.id} title={subtask.title} checked={subtask.isCompleted} />
+                  ))}
                 </Box>
               </Box>
               <DropDown label='Current Status' fullWidth value={props.values.currentStatus}>
-                <MenuItem value='Todo' onClick={() => props.getFieldHelpers('currentStatus').setValue('Todo')}>
-                  Todo
-                </MenuItem>
-                <MenuItem value='Doing' onClick={() => props.getFieldHelpers('currentStatus').setValue('Doing')}>
-                  Doing
-                </MenuItem>
-                <MenuItem value='Done' onClick={() => props.getFieldHelpers('currentStatus').setValue('Done')}>
-                  Done
-                </MenuItem>
+                {board?.columns.map(column => (
+                  <MenuItem
+                    key={column.id}
+                    value={column.name}
+                    onClick={() => props.getFieldHelpers('currentStatus').setValue(column.name)}
+                  >
+                    {column.name}
+                  </MenuItem>
+                ))}
               </DropDown>
             </DialogContent>
           </Form>

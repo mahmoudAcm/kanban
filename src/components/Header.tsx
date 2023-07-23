@@ -8,6 +8,7 @@ import usePageLoadingContext from '@/src/hooks/usePageLoadingContext';
 import { useAppDispatch } from '@/src/store';
 import { dialogsActions } from '@/src/slices/dialogs';
 import { DIALOG_IDS } from '@/src/constants';
+import useBoardsSelector from '@/src/hooks/useBoardsSelector';
 
 const Logo = styled('svg')(({ theme }) => ({
   display: 'none',
@@ -120,7 +121,8 @@ export default function Header() {
   const [isNavigationOpen, setNavigationOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { isPageLoading } = usePageLoadingContext();
-  const boardName = new Array(30).fill('Platform Launch').join(' ');
+  const { boards, activeBoardId } = useBoardsSelector();
+  const boardName = boards[activeBoardId]?.name ?? '';
 
   const open = Boolean(anchorEl);
 

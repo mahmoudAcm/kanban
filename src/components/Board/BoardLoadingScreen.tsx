@@ -41,7 +41,7 @@ export default function BoardLoadingScreen() {
                 animation='wave'
                 sx={{ background: theme => (theme.palette.__mode === 'DARK' ? 'var(--dark-grey)' : 'white') }}
               >
-                <Task {...getTasksProps(task)} />
+                <Task {...getTasksProps(task as any)} />
               </Skeleton>
             ))}
           </Box>

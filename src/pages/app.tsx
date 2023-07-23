@@ -1,24 +1,29 @@
 import MainLayout from '@/src/components/layouts/MainLayout';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { Box } from '@mui/material';
 import Head from 'next/head';
-import EmptyBoard from '@/src/components/Board/EmptyBoard';
 import BoardDialog from '@/src/components/Board/BoardDialog';
 import TaskDialog from '@/src/components/TaskDialog';
 import Board from '@/src/components/Board';
 import ViewTaskDetailsDialog from '@/src/components/ViewTaskDetailsDialog';
 import BoardLoadingScreen from '@/src/components/Board/BoardLoadingScreen';
 import usePageLoadingContext from '@/src/hooks/usePageLoadingContext';
+import { useAppDispatch } from '@/src/store';
+import { boardsActions } from '@/src/slices/boards';
 
 function App() {
+  const dispatch = useAppDispatch();
   const { isPageLoading } = usePageLoadingContext();
 
+  useEffect(() => {
+    dispatch(boardsActions.apiInitiateBoards()).then();
+  }, [dispatch]);
+
   return (
-    <Box sx={{ height: '20%' }}>
+    <Box sx={{ height: 'max(400px, 100%)' }}>
       <Head>
         <title>App</title>
       </Head>
-      {/*<EmptyBoard />*/}
       <BoardDialog />
       <TaskDialog />
       <ViewTaskDetailsDialog />

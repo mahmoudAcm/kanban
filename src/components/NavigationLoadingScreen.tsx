@@ -2,7 +2,7 @@ import { Box, Skeleton } from '@mui/material';
 
 export function NavSkeleton() {
   return (
-    <Box>
+    <Box sx={{ paddingLeft: 'var(--nav-left)' }}>
       <Skeleton
         animation='wave'
         variant='rounded'

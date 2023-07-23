@@ -2,13 +2,22 @@ import { Button, styled, Typography } from '@mui/material';
 import BoardIcon from '@/src/icons/BoardIcon';
 import { NavSkeleton } from '@/src/components/NavigationLoadingScreen';
 import usePageLoadingContext from '@/src/hooks/usePageLoadingContext';
+import useBoardsSelector from '@/src/hooks/useBoardsSelector';
+import { useAppDispatch } from '@/src/store';
+import { dialogsActions } from '@/src/slices/dialogs';
+import { DIALOG_IDS } from '@/src/constants';
+import { boardsActions } from '@/src/slices/boards';
+import 'react-perfect-scrollbar/dist/css/styles.css';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 export const Nav = styled('nav')(({ theme }) => ({
   '--nav-left': '32px',
   marginTop: 54,
-  marginLeft: 'var(--nav-left)',
   gridRow: 'span 1',
   height: '100%',
+  '& .ps__rail-y': {
+    background: 'transparent !important'
+  },
   [theme.breakpoints.down('md')]: {
     '--nav-left': '24px'
   }
@@ -17,8 +26,7 @@ export const Nav = styled('nav')(({ theme }) => ({
 export const List = styled('ul')(() => ({
   margin: 0,
   padding: 0,
-  listStyleType: 'none',
-  marginTop: 19
+  listStyleType: 'none'
 }));
 
 export const Item = styled('li')(({ theme }) => ({
@@ -35,7 +43,6 @@ export const Item = styled('li')(({ theme }) => ({
   userSelect: 'none',
   position: 'relative',
   isolation: 'isolate',
-  marginLeft: 'calc(var(--nav-left) * -1)',
   marginRight: 24,
   borderTopRightRadius: 100,
   borderBottomRightRadius: 100,
@@ -57,17 +64,15 @@ export const Item = styled('li')(({ theme }) => ({
 }));
 
 export const CreateNewBoardButton = styled(Button)(({ theme }) => ({
-  width: '100%',
+  width: 'calc(100% - 25px)',
   ...theme.typography.h3,
   color: 'var(--main-purple)',
   paddingLeft: 'var(--nav-left)',
   minHeight: 19,
-  paddingRight: 'calc(var(--nav-left) * 1.5)',
+  marginRight: 24,
   justifyContent: 'start',
   paddingTop: 14,
   paddingBottom: 15,
-  marginLeft: 'calc(var(--nav-left) * -1)',
-  marginRight: 24,
   gap: 16,
   borderRadius: 0,
   borderTopRightRadius: 100,
@@ -76,12 +81,18 @@ export const CreateNewBoardButton = styled(Button)(({ theme }) => ({
     margin: 0
   },
   [theme.breakpoints.down('md')]: {
+    // width: 'calc(100% - 21px)',
     marginRight: 20,
     gap: 12
   }
 }));
-export default function Navigation() {
+
+export default function Navigation({ onMobileNavigationClose }: { onMobileNavigationClose?: () => void }) {
+  const dispatch = useAppDispatch();
   const { isPageLoading } = usePageLoadingContext();
+  const count = useBoardsSelector<'count'>(({ count }) => count);
+  const boards = useBoardsSelector<'boards'>(({ boards }) => boards);
+  const activeBoardId = useBoardsSelector<'activeBoardId'>(({ activeBoardId }) => activeBoardId);
 
   return (
     <Nav className='Navigation'>
@@ -89,24 +100,39 @@ export default function Navigation() {
         <NavSkeleton />
       ) : (
         <>
-          <Typography variant='h4' color='var(--medium-grey)' className='Navigation-header'>
-            ALL BOARDS (3)
+          <Typography
+            variant='h4'
+            color='var(--medium-grey)'
+            className='Navigation-header'
+            sx={{ paddingBottom: '19px', paddingLeft: 'var(--nav-left)' }}
+          >
+            ALL BOARDS ({count})
           </Typography>
-          <List className='Navigation-list'>
-            <Item className='active Navigation-item'>
-              <BoardIcon />
-              Platform Launch
-            </Item>
-            <Item className='Navigation-item'>
-              <BoardIcon />
-              Marketing Plan
-            </Item>
-            <Item className='Navigation-item'>
-              <BoardIcon />
-              Roadmap
-            </Item>
-          </List>
-          <CreateNewBoardButton startIcon={<BoardIcon />} variant='text' className='Navigation-createNewBoard'>
+          <PerfectScrollbar style={{ maxHeight: 48 * 3 }}>
+            <List className='Navigation-list'>
+              {Object.values(boards).map(board => (
+                <Item
+                  className={['Navigation-item', board.id === activeBoardId ? 'active' : ''].filter(Boolean).join(' ')}
+                  key={board.id}
+                  onClick={() => {
+                    dispatch(boardsActions.setActiveBoardId(board.id));
+                    if (onMobileNavigationClose) onMobileNavigationClose();
+                  }}
+                >
+                  <BoardIcon />
+                  {board.name}
+                </Item>
+              ))}
+            </List>
+          </PerfectScrollbar>
+          <CreateNewBoardButton
+            startIcon={<BoardIcon />}
+            variant='text'
+            className='Navigation-createNewBoard'
+            onClick={() => {
+              dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.BOARD_DIALOG, type: 'create' }));
+            }}
+          >
             + Create New Board
           </CreateNewBoardButton>
         </>

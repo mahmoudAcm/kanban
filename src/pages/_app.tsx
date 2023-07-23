@@ -29,10 +29,10 @@ const App: FunctionComponent<AppProps> = props => {
 
   return (
     <CacheProvider value={emotionCache}>
-      <PageLoadingProvider>
-        <CustomThemeProvider>
-          <CssBaseline />
-          <Provider store={store}>
+      <Provider store={store}>
+        <PageLoadingProvider>
+          <CustomThemeProvider>
+            <CssBaseline />
             <Box
               sx={{
                 '& .Toastify__toast-container': {
@@ -51,9 +51,9 @@ const App: FunctionComponent<AppProps> = props => {
               <ToastContainer limit={4} newestOnTop />
             </Box>
             {!authGuard && getLayout(<Component {...pageProps} />)}
-          </Provider>
-        </CustomThemeProvider>
-      </PageLoadingProvider>
+          </CustomThemeProvider>
+        </PageLoadingProvider>
+      </Provider>
     </CacheProvider>
   );
 };

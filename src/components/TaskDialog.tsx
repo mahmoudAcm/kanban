@@ -18,11 +18,12 @@ import { useAppDispatch } from '@/src/store';
 import useDialogsSelector from '@/src/hooks/useDialogsSelector';
 import { DIALOG_IDS } from '@/src/constants';
 import { dialogsActions } from '@/src/slices/dialogs';
+import useTasksSelector from '@/src/hooks/useTasksSelector';
 
 const schema = yup.object({
   title: yup.string().required("Can't be blank"),
   description: yup.string().optional(),
-  subtasks: yup.array().of(yup.string().max(70, 'Must be at most 70 characters').required("Can't be blank")),
+  subtasks: yup.array().of(yup.string().max(500, 'Must be at most 500 characters').required("Can't be blank")),
   status: yup.string().required("Can't be blank")
 });
 
@@ -31,6 +32,9 @@ export default function TaskDialog() {
   const {
     [DIALOG_IDS.TASK_DIALOG]: { show, type }
   } = useDialogsSelector();
+  const { tasks, activeTaskId } = useTasksSelector();
+
+  const task = tasks[activeTaskId];
 
   const initialValues =
     type === 'create'
@@ -41,10 +45,10 @@ export default function TaskDialog() {
           status: 'Todo'
         }
       : {
-          title: 'Add authentication endpoints',
-          description: '',
-          subtasks: ['Define user model', 'Add auth endpoints'],
-          status: 'Doing'
+          title: task.title,
+          description: task.description,
+          subtasks: task.subtasks.map(subtask => subtask.title),
+          status: task.status
         };
 
   return (

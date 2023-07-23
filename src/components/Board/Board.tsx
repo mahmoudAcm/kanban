@@ -1,9 +1,12 @@
 import { Box, styled, Typography } from '@mui/material';
 import Task, { getTasksProps } from '@/src/components/Task';
-import data from '@/src/data.json';
 import { useAppDispatch } from '@/src/store';
 import { dialogsActions } from '@/src/slices/dialogs';
 import { DIALOG_IDS } from '@/src/constants';
+import useBoardsSelector from '@/src/hooks/useBoardsSelector';
+import useColumnsSelector from '@/src/hooks/useColumnsSelector';
+import useTasksSelector from '@/src/hooks/useTasksSelector';
+import EmptyBoard from '@/src/components/Board/EmptyBoard';
 
 export const BoardRoot = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -51,32 +54,52 @@ export const AddNewColumnButton = styled(Box)(({ theme }) => ({
   }
 }));
 
+function getStatusColor(index: number) {
+  const colors = ['#49C4E5', '#8471F2', '#67E2AE', '#EB144C', '#FF6900', '#ABB8C3'];
+  return colors[index % colors.length];
+}
+
 export default function Board() {
   const dispatch = useAppDispatch();
+  const { boards, activeBoardId } = useBoardsSelector();
+  const { columns } = useColumnsSelector();
+  const tasks = useTasksSelector<'tasks'>(({ tasks }) => tasks);
+
+  const board = boards[activeBoardId];
+
+  if (!board) return <></>;
+
+  if (!board.columns.length) return <EmptyBoard />;
+
+  console.log(board);
 
   return (
     <BoardRoot>
-      {data.boards[0].columns.map((column, index) => (
-        <Column key={index}>
-          <Status variant='h4'>
-            <Box
-              sx={{
-                width: '15px',
-                height: '15px',
-                borderRadius: '50%',
-                background: 'hsla(193, 75%, 59%, 1)',
-                mr: '12px'
-              }}
-            />
-            {column.name} ({column.tasks.length})
-          </Status>
-          <Box sx={{ display: 'grid', gap: '20px' }}>
-            {column.tasks.map((task, index) => (
-              <Task key={index} {...getTasksProps(task)} />
-            ))}
-          </Box>
-        </Column>
-      ))}
+      {board.columns.map((column, index) => {
+        const tasksIds = columns[column.id];
+        return (
+          <Column key={index}>
+            <Status variant='h4'>
+              <Box
+                sx={{
+                  width: '15px',
+                  height: '15px',
+                  borderRadius: '50%',
+                  // background: 'hsla(193, 75%, 59%, 1)',
+                  background: getStatusColor(index),
+                  mr: '12px'
+                }}
+              />
+              {column.name} ({tasksIds.length})
+            </Status>
+            <Box sx={{ display: 'grid', gap: '20px' }}>
+              {tasksIds.map((taskId, index) => (
+                <Task key={index} {...getTasksProps(tasks[taskId])} />
+              ))}
+            </Box>
+          </Column>
+        );
+      })}
       <AddNewColumnButton role='button' aria-label='Add New Column'>
         <Typography
           variant='h1'
