@@ -32,6 +32,7 @@ const Input = styled(Select)(({ theme }) => ({
 interface DropDownProps extends Pick<SelectProps, 'sx' | 'fullWidth' | 'error' | 'children' | 'value'> {
   label: string;
   helperText?: ReactNode | string;
+  disabled?: boolean;
 }
 
 export default function DropDown(props: DropDownProps) {
@@ -44,6 +45,7 @@ export default function DropDown(props: DropDownProps) {
       <Input
         value={props.value}
         sx={{ overflow: 'hidden' }}
+        disabled={props.disabled}
         MenuProps={{
           sx: {
             '& .MuiPaper-root': {

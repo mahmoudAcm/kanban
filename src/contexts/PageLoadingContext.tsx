@@ -8,7 +8,7 @@ export const PageLoadingContext = createContext({
 export function PageLoadingProvider({ children }: { children: ReactNode }) {
   const [isPageLoading, setPageLoading] = useState(true);
   const timeoutRef = useRef<any | null>(null);
-  const isBoardsReady = useBoardsSelector<'isBoardsReady'>(__boards => __boards.isBoardsReady);
+  const isBoardsReady = useBoardsSelector(({ isBoardsReady }) => isBoardsReady);
 
   useEffect(() => {
     timeoutRef.current = setTimeout(() => {

@@ -192,7 +192,7 @@ const themeOptions: Record<keyof typeof THEMES, ThemeOptions> = {
     components: {
       MuiButton: {
         styleOverrides: {
-          root: {
+          containedPrimary: {
             '&.Mui-disabled': {
               color: 'hsla(var(--white-alpha), 0.25)',
               background: 'hsla(var(--main-purple-alpha), 0.25)'
@@ -227,7 +227,7 @@ const themeOptions: Record<keyof typeof THEMES, ThemeOptions> = {
     components: {
       MuiButton: {
         styleOverrides: {
-          root: {
+          containedPrimary: {
             '&.Mui-disabled': {
               color: 'white',
               background: 'hsla(var(--main-purple-alpha), 0.25)'

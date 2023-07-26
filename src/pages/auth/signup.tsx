@@ -50,7 +50,7 @@ function Signup() {
 Signup.getLayout = (page: ReactNode) => (
   <AuthLayout
     /*imageUrl='/images/auth/auth.svg'*/ title='Create an account'
-    subtitle='Streamline Your Workflow: Create a New Account and Get Started with Our Kanban App!'
+    subtitle='Streamline Your Workflow: Create a New Account and Get Started with Our Kanban Id!'
   >
     <Head>
       <title>Kanban - Create Your Kanban Task Management Account</title>

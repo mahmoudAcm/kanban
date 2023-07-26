@@ -121,8 +121,9 @@ export default function Header() {
   const [isNavigationOpen, setNavigationOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { isPageLoading } = usePageLoadingContext();
-  const { boards, activeBoardId } = useBoardsSelector();
-  const boardName = boards[activeBoardId]?.name ?? '';
+  const board = useBoardsSelector(({ boards, activeBoardId }) => boards[activeBoardId]);
+
+  const boardName = board?.name;
 
   const open = Boolean(anchorEl);
 
@@ -184,7 +185,7 @@ export default function Header() {
         <AddTaskButton
           size='large'
           aria-label='Add Task'
-          disabled={isPageLoading}
+          disabled={isPageLoading || board?.columns.length === 0}
           onClick={() => {
             dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.TASK_DIALOG, type: 'create' }));
           }}

@@ -1,10 +1,12 @@
 import { RootState, useAppSelector } from '@/src/store';
+import { createSelector } from 'reselect';
 
-export default function useBoardsSelector<Key extends keyof RootState['__boards'] = never>(
-  selector?: (boards: RootState['__boards']) => RootState['__boards'][Key]
-) {
-  return useAppSelector(state => {
-    const __boards = state.__boards;
-    return selector ? selector(__boards) : __boards;
-  }) as RootState['__boards'][Key] extends never ? RootState['__boards'] : RootState['__boards'][Key];
+type State = RootState['__boards'];
+
+export default function useBoardsSelector<T>(selector?: (__boards: State) => T | State) {
+  return useAppSelector(
+    createSelector((state: RootState) => {
+      return state.__boards;
+    }, selector ?? (__boards => __boards))
+  ) as T | undefined;
 }

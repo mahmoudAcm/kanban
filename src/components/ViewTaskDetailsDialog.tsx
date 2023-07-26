@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Box, Dialog, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Typography } from '@mui/material';
+import { useMemo, useState } from 'react';
+import { Box, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import DropDown from '@/src/components/inputs/DropDown';
 import { Form, Formik } from 'formik';
 import Subtask from '@/src/components/Subtask';
@@ -11,22 +11,26 @@ import { dialogsActions } from '@/src/slices/dialogs';
 import useTasksSelector from '@/src/hooks/useTasksSelector';
 import useBoardsSelector from '@/src/hooks/useBoardsSelector';
 import { getTasksProps } from '@/src/components/Task';
+import AnimatedDialog from '@/src/components/Dialogs/AnimatedDialog';
 
 export default function ViewTaskDetailsDialog() {
   const {
     [DIALOG_IDS.VIEW_TASK_DIALOG]: { show }
   } = useDialogsSelector();
-  const boards = useBoardsSelector<'boards'>(({ boards }) => boards);
-  const activeBoardId = useBoardsSelector<'activeBoardId'>(({ activeBoardId }) => activeBoardId);
-  const { activeTaskId, tasks } = useTasksSelector();
+  const board = useBoardsSelector(({ boards, activeBoardId }) => boards[activeBoardId]);
+  const task = useTasksSelector(({ tasks, activeTaskId }) => tasks[activeTaskId]);
   const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  if (!activeTaskId) return <></>;
+  const status = useMemo(() => {
+    const columns = board?.columns ?? [];
+    const columnId = task?.columnId ?? '';
+    return columns.find(column => column.id == columnId)?.name ?? '';
+  }, [board, task]);
+
+  if (!task) return <></>;
 
   const isMenuOpen = Boolean(anchorEl);
-  const board = boards[activeBoardId];
-  const task = tasks[activeTaskId];
   const taskProps = getTasksProps(task);
 
   const closeMenu = () => {
@@ -34,11 +38,15 @@ export default function ViewTaskDetailsDialog() {
   };
 
   return (
-    <Dialog
+    <AnimatedDialog
       open={show}
       fullWidth
       onClose={() => {
         dispatch(dialogsActions.closeDialog(DIALOG_IDS.VIEW_TASK_DIALOG));
+      }}
+      keepMounted
+      TransitionProps={{
+        direction: 'left'
       }}
     >
       <DialogTitle sx={{ display: 'flex', gap: '8.5px', alignItems: 'center' }}>
@@ -57,7 +65,7 @@ export default function ViewTaskDetailsDialog() {
       </DialogTitle>
       <Formik
         initialValues={{
-          currentStatus: 'Doing'
+          currentStatus: status
         }}
         // validationSchema={schema}
         onSubmit={(values, actions) => {
@@ -127,6 +135,6 @@ export default function ViewTaskDetailsDialog() {
         </MenuItem>
         <MenuItem sx={{ color: 'var(--red)' }}>Delete Task</MenuItem>
       </Menu>
-    </Dialog>
+    </AnimatedDialog>
   );
 }

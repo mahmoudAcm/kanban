@@ -9,7 +9,7 @@ import {
   MenuItem,
   Typography
 } from '@mui/material';
-import { ArrayHelpers, FieldArray, Form, Formik } from 'formik';
+import { ArrayHelpers, FieldArray, Form, Formik, FormikHelpers } from 'formik';
 import * as yup from 'yup';
 import TextField from '@/src/components/inputs/TextField';
 import CloseIcon from '@/src/icons/CloseIcon';
@@ -19,6 +19,9 @@ import useDialogsSelector from '@/src/hooks/useDialogsSelector';
 import { DIALOG_IDS } from '@/src/constants';
 import { dialogsActions } from '@/src/slices/dialogs';
 import useTasksSelector from '@/src/hooks/useTasksSelector';
+import useBoardsSelector from '@/src/hooks/useBoardsSelector';
+import { useMemo } from 'react';
+import $sleep from '@/src/libs/$sleep';
 
 const schema = yup.object({
   title: yup.string().required("Can't be blank"),
@@ -32,9 +35,16 @@ export default function TaskDialog() {
   const {
     [DIALOG_IDS.TASK_DIALOG]: { show, type }
   } = useDialogsSelector();
-  const { tasks, activeTaskId } = useTasksSelector();
+  const board = useBoardsSelector(({ boards, activeBoardId }) => boards[activeBoardId]);
+  const task = useTasksSelector(({ tasks, activeTaskId }) => tasks[activeTaskId]);
 
-  const task = tasks[activeTaskId];
+  const status = useMemo(() => {
+    const columns = board?.columns;
+    const columnId = task?.columnId;
+    return columns?.find(column => column.id == columnId)?.name ?? '';
+  }, [board, task]);
+
+  if (!board?.columns.length) return <></>;
 
   const initialValues =
     type === 'create'
@@ -42,14 +52,20 @@ export default function TaskDialog() {
           title: '',
           description: '',
           subtasks: ['', ''],
-          status: 'Todo'
+          status: board?.columns?.[0].name
         }
       : {
-          title: task.title,
-          description: task.description,
-          subtasks: task.subtasks.map(subtask => subtask.title),
-          status: task.status
+          title: task?.title ?? '',
+          description: task?.description ?? '',
+          subtasks: task?.subtasks.map(subtask => subtask.title) ?? [],
+          status
         };
+
+  async function handleSubmit<Values = typeof initialValues>(values: Values, actions: FormikHelpers<Values>) {
+    actions.setSubmitting(true);
+    await $sleep(5000);
+    actions.setSubmitting(false);
+  }
 
   return (
     <Dialog
@@ -62,13 +78,7 @@ export default function TaskDialog() {
       <DialogTitle>
         <Typography variant='h2'>{type === 'create' ? 'Add New' : 'Edit'} Task</Typography>
       </DialogTitle>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={schema}
-        onSubmit={(values, actions) => {
-          console.log(values);
-        }}
-      >
+      <Formik initialValues={initialValues} validationSchema={schema} onSubmit={handleSubmit}>
         {props => (
           <Form>
             <DialogContent sx={{ mt: '24px' }}>
@@ -79,6 +89,7 @@ export default function TaskDialog() {
                 error={!!props.errors.title && props.touched.title}
                 helperText={props.errors.title}
                 inputProps={props.getFieldProps('title')}
+                disabled={props.isSubmitting}
               />
               <TextField
                 label='Description'
@@ -95,6 +106,7 @@ export default function TaskDialog() {
                     height: '95.17px !important'
                   }
                 }}
+                disabled={props.isSubmitting}
               />
               <FieldArray
                 name='subtasks'
@@ -111,6 +123,7 @@ export default function TaskDialog() {
                             inputProps={props.getFieldProps(`subtasks.${index}`)}
                             error={!!props.errors.subtasks?.[index] && !!(props.touched.subtasks as any)?.[index]}
                             helperText={props.errors.subtasks?.[index]}
+                            disabled={props.isSubmitting}
                           />
                           <IconButton
                             sx={{
@@ -121,6 +134,7 @@ export default function TaskDialog() {
                             onClick={() => {
                               arrayHelpers.remove(index);
                             }}
+                            disabled={props.isSubmitting}
                           >
                             <CloseIcon />
                           </IconButton>
@@ -136,24 +150,31 @@ export default function TaskDialog() {
                       onClick={() => {
                         arrayHelpers.push('');
                       }}
+                      disabled={props.isSubmitting}
                     >
                       + Add New Column
                     </Button>
                   </FormGroup>
                 )}
               />
-              <DropDown label='Status' fullWidth value={props.values.status} sx={{ mb: '24px' }}>
-                <MenuItem value='Todo' onClick={() => props.getFieldHelpers('status').setValue('Todo')}>
-                  Todo
-                </MenuItem>
-                <MenuItem value='Doing' onClick={() => props.getFieldHelpers('status').setValue('Doing')}>
-                  Doing
-                </MenuItem>
-                <MenuItem value='Done' onClick={() => props.getFieldHelpers('status').setValue('Done')}>
-                  Done
-                </MenuItem>
+              <DropDown
+                label='Status'
+                fullWidth
+                value={props.values.status}
+                sx={{ mb: '24px' }}
+                disabled={props.isSubmitting}
+              >
+                {board?.columns.map(column => (
+                  <MenuItem
+                    key={column.id}
+                    value={column.name}
+                    onClick={() => props.getFieldHelpers('status').setValue(column.name)}
+                  >
+                    {column.name}
+                  </MenuItem>
+                ))}
               </DropDown>
-              <Button size='small' fullWidth type='submit'>
+              <Button size='small' fullWidth type='submit' disabled={props.isSubmitting}>
                 {type === 'create' ? 'Create Task' : 'Save Changes'}
               </Button>
             </DialogContent>

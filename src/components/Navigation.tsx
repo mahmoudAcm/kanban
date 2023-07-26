@@ -6,9 +6,10 @@ import useBoardsSelector from '@/src/hooks/useBoardsSelector';
 import { useAppDispatch } from '@/src/store';
 import { dialogsActions } from '@/src/slices/dialogs';
 import { DIALOG_IDS } from '@/src/constants';
-import { boardsActions } from '@/src/slices/boards';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
+import { useRouter } from 'next/router';
+import { useEffect, useRef } from 'react';
 
 export const Nav = styled('nav')(({ theme }) => ({
   '--nav-left': '32px',
@@ -89,10 +90,24 @@ export const CreateNewBoardButton = styled(Button)(({ theme }) => ({
 
 export default function Navigation({ onMobileNavigationClose }: { onMobileNavigationClose?: () => void }) {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const { isPageLoading } = usePageLoadingContext();
-  const count = useBoardsSelector<'count'>(({ count }) => count);
-  const boards = useBoardsSelector<'boards'>(({ boards }) => boards);
-  const activeBoardId = useBoardsSelector<'activeBoardId'>(({ activeBoardId }) => activeBoardId);
+  const __boards = useBoardsSelector(({ isBoardsReady, ...rest }) => rest);
+  const containerRef = useRef<HTMLElement | null>(null);
+  const scrolledToActiveItemRef = useRef(false);
+
+  //scrolls to the current active item we only do this for the first render only
+  useEffect(() => {
+    if (scrolledToActiveItemRef.current) return;
+
+    const board = __boards?.boards[__boards?.activeBoardId];
+    const container = containerRef.current;
+
+    if (board && container) {
+      container.scrollTop = board.index * 48;
+      scrolledToActiveItemRef.current = true;
+    }
+  }, [__boards?.boards, __boards?.activeBoardId]);
 
   return (
     <Nav className='Navigation'>
@@ -106,16 +121,22 @@ export default function Navigation({ onMobileNavigationClose }: { onMobileNaviga
             className='Navigation-header'
             sx={{ paddingBottom: '19px', paddingLeft: 'var(--nav-left)' }}
           >
-            ALL BOARDS ({count})
+            ALL BOARDS ({__boards?.count ?? 0})
           </Typography>
-          <PerfectScrollbar style={{ maxHeight: 48 * 3 }}>
+          <PerfectScrollbar
+            className='PerfectScrollbar'
+            containerRef={container => (containerRef.current = container)}
+            style={{ maxHeight: 48 * 5, height: 'auto' }}
+          >
             <List className='Navigation-list'>
-              {Object.values(boards).map(board => (
+              {Object.values(__boards?.boards ?? {}).map(board => (
                 <Item
-                  className={['Navigation-item', board.id === activeBoardId ? 'active' : ''].filter(Boolean).join(' ')}
+                  className={['Navigation-item', board.id === __boards?.activeBoardId ? 'active' : '']
+                    .filter(Boolean)
+                    .join(' ')}
                   key={board.id}
-                  onClick={() => {
-                    dispatch(boardsActions.setActiveBoardId(board.id));
+                  onClick={async () => {
+                    await router.push('/boards/' + board.id);
                     if (onMobileNavigationClose) onMobileNavigationClose();
                   }}
                 >

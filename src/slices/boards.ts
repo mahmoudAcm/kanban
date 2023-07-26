@@ -13,6 +13,7 @@ type Column = {
 
 type Board = {
   id: string;
+  index: number;
   name: string;
   columns: Column[];
 };
@@ -28,13 +29,16 @@ export const boardsSlice = createSlice({
   reducers: {
     initiateBoard(state, action: PayloadAction<Board[]>) {
       const boards = action.payload;
+      let index = 0;
       for (const board of boards) {
         if (!state.activeBoardId) state.activeBoardId = board.id;
         state.boards[board.id] = {
+          index,
           id: board.id,
           name: board.name,
           columns: board.columns.map(({ tasks, ...rest }) => rest)
         };
+        index++;
       }
       state.count = boards.length;
       state.isBoardsReady = true;
@@ -42,9 +46,16 @@ export const boardsSlice = createSlice({
     setActiveBoardId(state, action: PayloadAction<string>) {
       state.activeBoardId = action.payload;
     },
+    increaseCount(state) {
+      state.count++;
+    },
     updateOrAddBoard(state, action: PayloadAction<Board>) {
       const board = action.payload;
+      const len = state.count;
+      const prevIndex = state.boards[board.id]?.index;
+
       state.boards[board.id] = {
+        index: prevIndex ?? len,
         id: board.id,
         name: board.name,
         columns: board.columns.map(({ tasks, ...rest }) => rest)
@@ -73,24 +84,36 @@ function apiInitiateBoards() {
       }
     }
     dispatch(boardsSlice.actions.initiateBoard(data));
+    return data?.[0].id;
   };
 }
 
 function apiAddBoard(board: { name: string; columns: { name: string }[] }) {
   return async (dispatch: AppDispatch) => {
-    const res = await axios.post<{ board: Board }>('/api/boards', board);
-    const data = res.data;
-    dispatch(boardsSlice.actions.updateOrAddBoard(data.board));
-    dispatch(columnsActions.updateOrAddColumns(data.board.columns.map(({ id }) => id)));
+    try {
+      const res = await axios.post<{ message: string; board: Board }>('/api/boards', board);
+      const data = res.data;
+      dispatch(boardsSlice.actions.updateOrAddBoard(data.board));
+      dispatch(boardsSlice.actions.increaseCount());
+      dispatch(columnsActions.updateOrAddColumns(data.board.columns.map(({ id }) => id)));
+      return data.message;
+    } catch (error) {
+      throw error;
+    }
   };
 }
 
-function apiUpdateBoard(board: Board) {
-  return async () => {
-    const res = await axios.put<{ board: Board }>('/api/boards', board);
-    const data = res.data;
-    boardsSlice.actions.updateOrAddBoard(data.board);
-    columnsActions.updateOrAddColumns(data.board.columns.map(({ id }) => id));
+function apiUpdateBoard(board: { id: string; name: string; columns: { id?: string; name: string }[] }) {
+  return async (dispatch: AppDispatch) => {
+    try {
+      const res = await axios.put<{ message: string; board: Board }>('/api/boards/' + board.id, board);
+      const data = res.data;
+      dispatch(boardsSlice.actions.updateOrAddBoard(data.board));
+      dispatch(columnsActions.updateOrAddColumns(data.board.columns.map(({ id }) => id)));
+      return data.message;
+    } catch (error) {
+      throw error;
+    }
   };
 }
 

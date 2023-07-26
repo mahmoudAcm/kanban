@@ -4,7 +4,7 @@ import { useAppDispatch } from '@/src/store';
 import { dialogsActions } from '@/src/slices/dialogs';
 import { DIALOG_IDS } from '@/src/constants';
 import useBoardsSelector from '@/src/hooks/useBoardsSelector';
-import useColumnsSelector from '@/src/hooks/useColumnsSelector';
+import { useActiveColumnsSelector } from '@/src/hooks/useColumnsSelector';
 import useTasksSelector from '@/src/hooks/useTasksSelector';
 import EmptyBoard from '@/src/components/Board/EmptyBoard';
 
@@ -61,17 +61,15 @@ function getStatusColor(index: number) {
 
 export default function Board() {
   const dispatch = useAppDispatch();
-  const { boards, activeBoardId } = useBoardsSelector();
-  const { columns } = useColumnsSelector();
-  const tasks = useTasksSelector<'tasks'>(({ tasks }) => tasks);
+  const columns = useActiveColumnsSelector();
+  const tasks = useTasksSelector(({ tasks }) => tasks);
+  const board = useBoardsSelector(({ boards, activeBoardId }) => boards[activeBoardId]);
 
-  const board = boards[activeBoardId];
+  console.log('board is rendered');
 
   if (!board) return <></>;
 
   if (!board.columns.length) return <EmptyBoard />;
-
-  console.log(board);
 
   return (
     <BoardRoot>
@@ -93,9 +91,11 @@ export default function Board() {
               {column.name} ({tasksIds.length})
             </Status>
             <Box sx={{ display: 'grid', gap: '20px' }}>
-              {tasksIds.map((taskId, index) => (
-                <Task key={index} {...getTasksProps(tasks[taskId])} />
-              ))}
+              {tasksIds.map((taskId, index) => {
+                const task = tasks?.[taskId];
+                if (!task) return <></>;
+                return <Task key={index} {...getTasksProps(task)} />;
+              })}
             </Box>
           </Column>
         );

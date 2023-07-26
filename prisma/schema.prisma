@@ -32,7 +32,6 @@ model Task {
   id          String    @unique @default(cuid())
   title       String
   description String?   @db.LongText()
-  status      String
   subtasks    SubTask[]
 
   Column   Column @relation(fields: [columnId], references: [id], onDelete: Cascade)

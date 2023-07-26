@@ -7,17 +7,25 @@ import TaskDialog from '@/src/components/TaskDialog';
 import Board from '@/src/components/Board';
 import ViewTaskDetailsDialog from '@/src/components/ViewTaskDetailsDialog';
 import BoardLoadingScreen from '@/src/components/Board/BoardLoadingScreen';
-import usePageLoadingContext from '@/src/hooks/usePageLoadingContext';
 import { useAppDispatch } from '@/src/store';
 import { boardsActions } from '@/src/slices/boards';
+import useBoardsSelector from '@/src/hooks/useBoardsSelector';
+import { useRouter } from 'next/router';
 
-function App() {
+function BoardPage() {
+  const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isPageLoading } = usePageLoadingContext();
+  const isBoardsReady = useBoardsSelector(({ isBoardsReady }) => isBoardsReady);
 
   useEffect(() => {
-    dispatch(boardsActions.apiInitiateBoards()).then();
-  }, [dispatch]);
+    if (!isBoardsReady) dispatch(boardsActions.apiInitiateBoards()).then();
+  }, [dispatch, isBoardsReady]);
+
+  useEffect(() => {
+    if (router.isReady) {
+      dispatch(boardsActions.setActiveBoardId(router.query.id as string));
+    }
+  }, [router, dispatch]);
 
   return (
     <Box sx={{ height: 'max(400px, 100%)' }}>
@@ -27,13 +35,13 @@ function App() {
       <BoardDialog />
       <TaskDialog />
       <ViewTaskDetailsDialog />
-      {isPageLoading ? <BoardLoadingScreen /> : <Board />}
+      {!isBoardsReady ? <BoardLoadingScreen /> : <Board />}
     </Box>
   );
 }
 
-App.getLayout = (page: ReactNode) => <MainLayout>{page}</MainLayout>;
+BoardPage.getLayout = (page: ReactNode) => <MainLayout>{page}</MainLayout>;
 
-App.authGuard = process.env.NODE_ENV === 'production';
+BoardPage.authGuard = process.env.NODE_ENV === 'production';
 
-export default App;
+export default BoardPage;

@@ -35,6 +35,9 @@ const App: FunctionComponent<AppProps> = props => {
             <CssBaseline />
             <Box
               sx={{
+                '& .Toastify__toast': {
+                  boxShadow: '0px 10px 20px 0px rgba(54, 78, 126, 0.25)'
+                },
                 '& .Toastify__toast-container': {
                   '@media (max-width: 487px)': {
                     width: 'calc(100% - 2em)',
@@ -48,7 +51,7 @@ const App: FunctionComponent<AppProps> = props => {
                 }
               }}
             >
-              <ToastContainer limit={4} newestOnTop />
+              <ToastContainer limit={4} newestOnTop theme='dark' />
             </Box>
             {!authGuard && getLayout(<Component {...pageProps} />)}
           </CustomThemeProvider>

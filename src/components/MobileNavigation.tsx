@@ -33,6 +33,9 @@ export default function MobileNavigation({ open, onClose }: MobileNavigationProp
           '& .Navigation': {
             mt: '16px'
           },
+          '& .PerfectScrollbar': {
+            maxHeight: 'calc(48px * 3) !important'
+          },
           '& .Navigation-item, & .Navigation-createNewBoard': {
             '--nav-left': '24px',
             marginRight: '24px'
