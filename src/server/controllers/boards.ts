@@ -6,6 +6,16 @@ import { PayloadError } from '@/src/server/libs/customErrors';
 import { InferType } from 'yup';
 import { getBoardMiddleware } from '@/src/server/middlewares/boards';
 
+export async function getFirstBoardId() {
+  const board = await prisma.board.findFirst({
+    select: {
+      id: true
+    }
+  });
+
+  return board?.id ?? '404';
+}
+
 export async function getBoards(req: NextApiRequest, res: NextApiResponse) {
   try {
     const boards = await prisma.board.findMany({
