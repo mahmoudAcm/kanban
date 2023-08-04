@@ -3,6 +3,7 @@ import axios from 'axios';
 import { columnsActions } from '@/src/slices/columns';
 import { AppDispatch } from '@/src/store';
 import { tasksActions } from '@/src/slices/tasks';
+import $sleep from '@/src/libs/$sleep';
 
 type Column = {
   id: string;
@@ -74,6 +75,10 @@ function apiInitiateBoards() {
   return async (dispatch: AppDispatch) => {
     const res = await axios.get<Board[]>('/api/boards');
     const data = res.data;
+
+    //using a small delay so that animation looks petter not glitches
+    await $sleep(700);
+
     for (const board of data) {
       dispatch(columnsActions.updateOrAddColumns(board.columns.map(({ id }) => id)));
       for (const column of board.columns) {

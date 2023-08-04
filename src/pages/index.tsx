@@ -1,11 +1,12 @@
 import Head from 'next/head';
-import { Box, Button, Container, MenuItem, Typography } from '@mui/material';
+import { Alert, Box, Button, Container, MenuItem, Typography } from '@mui/material';
 import DestructiveButton from '@/src/components/buttons/DestructiveButton';
 import TextField from '@/src/components/inputs/TextField';
 import DropDown from '@/src/components/inputs/DropDown';
-import { MouseEventHandler, useState } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
 import ThemeSwitcher from '@/src/components/ThemeSwitcher';
 import Subtask from '@/src/components/Subtask';
+import $toast, { $toastUpdate } from '@/src/libs/$toast';
 
 function Home() {
   const [selectValue, setSelectValue] = useState('Doing');
@@ -13,6 +14,25 @@ function Home() {
   const onSelect: MouseEventHandler<HTMLLIElement> = evt => {
     setSelectValue(evt.currentTarget.dataset.value!);
   };
+
+  useEffect(() => {
+    const toastId = $toast('working so hard', {
+      type: 'default',
+      isLoading: true
+    });
+
+    $toast('working so hard', {
+      type: 'success'
+    });
+
+    setTimeout(() => {
+      $toastUpdate(toastId, {
+        type: 'success',
+        isLoading: false,
+        message: 'Working as expected'
+      });
+    }, 5000);
+  }, []);
 
   return (
     <Container>
@@ -97,6 +117,9 @@ function Home() {
         <Subtask title='Idle' />
         <Subtask title='Completed' checked />
       </Box>
+      <Alert severity='error' onClose={() => {}}>
+        dsjkafkfhds
+      </Alert>
     </Container>
   );
 }

@@ -39,8 +39,11 @@ const App: FunctionComponent<AppProps> = props => {
                   boxShadow: '0px 10px 20px 0px rgba(54, 78, 126, 0.25)'
                 },
                 '& .Toastify__toast-container': {
+                  // width: 'auto',
+                  // minWidth: 'min(460px, calc(100% - 2em))',
                   '@media (max-width: 487px)': {
                     width: 'calc(100% - 2em)',
+                    // minWidth: 'auto',
                     top: '1em',
                     left: '1em',
                     right: '1em',
@@ -51,7 +54,7 @@ const App: FunctionComponent<AppProps> = props => {
                 }
               }}
             >
-              <ToastContainer limit={4} newestOnTop theme='dark' />
+              <ToastContainer limit={4} newestOnTop containerId='ToastContainer-1' />
             </Box>
             {!authGuard && getLayout(<Component {...pageProps} />)}
           </CustomThemeProvider>
