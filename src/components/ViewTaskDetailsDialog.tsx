@@ -61,7 +61,7 @@ export default function ViewTaskDetailsDialog() {
     actions: FormikHelpers<Values>
   ) {
     try {
-      await dispatch(tasksActions.apiMoveTask(board?.id!, currentStatus.columnId, currentStatus.status, task!));
+      await dispatch(tasksActions.apiMoveTask(board?.id!, currentStatus.columnId, task!));
     } catch (error) {
       const toastId = $toast('Oops! Something went wrong while moving the task. Please try again later.', {
         type: 'error',
@@ -100,7 +100,7 @@ export default function ViewTaskDetailsDialog() {
           <VerticalDotsIcon sx={{ width: '20px !important' }} />
         </IconButton>
       </DialogTitle>
-      <Formik initialValues={initialValues} key={task.status} onSubmit={handleSubmit}>
+      <Formik initialValues={initialValues} key={status} onSubmit={handleSubmit}>
         {props => (
           <Form>
             <DialogContent sx={{ mt: '24px', pb: '32px !important' }}>
@@ -109,7 +109,7 @@ export default function ViewTaskDetailsDialog() {
                   {task.description}
                 </Typography>
               )}
-              <Box sx={{ my: '24px' }}>
+              <Box sx={{ my: '24px', display: taskProps.subtasksCount === 0 ? 'none' : undefined }}>
                 <Typography variant='body2' sx={{ color: 'var(--medium-grey)' }}>
                   Subtasks ({taskProps.completedSubtasksCount} of {taskProps.subtasksCount})
                 </Typography>

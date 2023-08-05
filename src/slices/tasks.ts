@@ -15,7 +15,6 @@ type Task = {
   title: string;
   description: string;
   columnId: string;
-  status: string;
   subtasks: SubTask[];
 };
 
@@ -47,18 +46,67 @@ export const tasksSlice = createSlice({
         }
       }
     },
-    moveTask(state, action: PayloadAction<{ id: string; destColumnId: string; status: string }>) {
-      const { id, destColumnId, status } = action.payload;
+    moveTask(state, action: PayloadAction<{ id: string; destColumnId: string }>) {
+      const { id, destColumnId } = action.payload;
       const task = state.tasks?.[id];
       if (task) {
         task.columnId = destColumnId;
-        task.status = status;
       }
     }
   }
 });
 
 export const tasksReducer = tasksSlice.reducer;
+
+function apiAddTask(
+  boardId: string,
+  columnId: string,
+  newTask: {
+    title: string;
+    description: string;
+    subtasks: { title: string }[];
+  }
+) {
+  return async (dispatch: AppDispatch) => {
+    try {
+      const res = await axios.post<{ task: Task }>(`/api/boards/${boardId}/columns/${columnId}/tasks`, newTask);
+      const { task } = res.data;
+
+      dispatch(tasksSlice.actions.updateOrAddTask(task));
+      dispatch(columnsActions.addTaskIdToColumn({ columnId, taskId: task.id }));
+    } catch (error) {
+      throw error;
+    }
+  };
+}
+
+function apiUpdateTask(
+  boardId: string,
+  columnId: string,
+  id: string,
+  newTask: {
+    title: string;
+    description: string;
+    subtasks: { title: string }[];
+  }
+) {
+  return async (dispatch: AppDispatch) => {
+    try {
+      const res = await axios.put<Task>(`/api/boards/${boardId}/columns/${columnId}/tasks/${id}`, newTask);
+      const task = res.data;
+
+      dispatch(tasksSlice.actions.updateOrAddTask(task));
+
+      //if the column id changed means we updated the task status
+      if (task.columnId !== columnId) {
+        await dispatch(columnsActions.moveTaskBetweenColumns(columnId, task.columnId, task.id));
+        dispatch(tasksSlice.actions.moveTask({ destColumnId: task.columnId, id: task.id }));
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+}
 
 function apiToggleSubtask(boardId: string, columnId: string, taskId: string, id: string) {
   return async (dispatch: AppDispatch) => {
@@ -73,12 +121,12 @@ function apiToggleSubtask(boardId: string, columnId: string, taskId: string, id:
   };
 }
 
-function apiMoveTask(boardId: string, destColumnId: string, status: string, task: Task) {
+function apiMoveTask(boardId: string, destColumnId: string, task: Task) {
   return async (dispatch: AppDispatch) => {
     const srcColumnId = task.columnId;
     try {
       await dispatch(columnsActions.moveTaskBetweenColumns(srcColumnId, destColumnId, task.id));
-      dispatch(tasksSlice.actions.moveTask({ destColumnId, id: task.id, status }));
+      dispatch(tasksSlice.actions.moveTask({ destColumnId, id: task.id }));
 
       await axios.patch(`/api/boards/${boardId}/columns/${srcColumnId}/tasks/${task.id}`, {
         destinationColumnId: destColumnId
@@ -89,4 +137,4 @@ function apiMoveTask(boardId: string, destColumnId: string, status: string, task
   };
 }
 
-export const tasksActions = { apiToggleSubtask, apiMoveTask, ...tasksSlice.actions };
+export const tasksActions = { apiAddTask, apiUpdateTask, apiToggleSubtask, apiMoveTask, ...tasksSlice.actions };
