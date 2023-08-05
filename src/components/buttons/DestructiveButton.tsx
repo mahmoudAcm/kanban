@@ -7,7 +7,7 @@ export default function DestructiveButton(props: ButtonProps) {
       sx={{
         background: 'var(--red)',
         px: '67.5px',
-        '&:hover': {
+        '&:hover,&:disabled': {
           background: 'var(--red-hover)'
         },
         ...props?.sx

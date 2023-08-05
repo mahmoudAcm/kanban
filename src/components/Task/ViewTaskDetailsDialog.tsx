@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Box, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import DropDown from '@/src/components/inputs/DropDown';
 import { Form, Formik, FormikHelpers } from 'formik';
-import Subtask from '@/src/components/Subtask';
+import Subtask from '@/src/components/Task/Subtask';
 import VerticalDotsIcon from '@/src/icons/VerticalDotsIcon';
 import { useAppDispatch } from '@/src/store';
 import useDialogsSelector from '@/src/hooks/useDialogsSelector';
@@ -10,7 +10,7 @@ import { DIALOG_IDS } from '@/src/constants';
 import { dialogsActions } from '@/src/slices/dialogs';
 import useTasksSelector from '@/src/hooks/useTasksSelector';
 import useBoardsSelector from '@/src/hooks/useBoardsSelector';
-import { getTasksProps } from '@/src/components/Task';
+import { getTasksProps } from '@/src/components/Task/Task';
 import AnimatedDialog from '@/src/components/Dialogs/AnimatedDialog';
 import { tasksActions } from '@/src/slices/tasks';
 import $toast, { $toastify } from '@/src/libs/$toast';
@@ -173,7 +173,15 @@ export default function ViewTaskDetailsDialog() {
         >
           Edit Task
         </MenuItem>
-        <MenuItem sx={{ color: 'var(--red)' }}>Delete Task</MenuItem>
+        <MenuItem
+          sx={{ color: 'var(--red)' }}
+          onClick={() => {
+            dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.DELETE_TASK_DIALOG }));
+            closeMenu();
+          }}
+        >
+          Delete Task
+        </MenuItem>
       </Menu>
     </AnimatedDialog>
   );

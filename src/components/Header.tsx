@@ -185,7 +185,7 @@ export default function Header() {
         <AddTaskButton
           size='large'
           aria-label='Add Task'
-          disabled={isPageLoading || board?.columns.length === 0}
+          disabled={isPageLoading || !board || board?.columns.length === 0}
           onClick={() => {
             dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.TASK_DIALOG, type: 'create' }));
           }}
@@ -198,7 +198,7 @@ export default function Header() {
           onClick={event => {
             setAnchorEl(event.currentTarget);
           }}
-          disabled={isPageLoading}
+          disabled={isPageLoading || !board}
         >
           <VerticalDotsIcon sx={{ width: '20px !important' }} />
         </BoardMenuButton>
@@ -240,7 +240,15 @@ export default function Header() {
         >
           Edit Board
         </MenuItem>
-        <MenuItem sx={{ color: 'var(--red)' }}>Delete Board</MenuItem>
+        <MenuItem
+          sx={{ color: 'var(--red)' }}
+          onClick={() => {
+            dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.DELETE_BOARD_DIALOG }));
+            closeMenu();
+          }}
+        >
+          Delete Board
+        </MenuItem>
       </Menu>
       <MobileNavigation
         open={isNavigationOpen}

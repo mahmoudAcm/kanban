@@ -122,13 +122,14 @@ function apiUpdateBoard(board: { id: string; name: string; columns: { id?: strin
   };
 }
 
-function apiRemoveBoard(boards: Record<string, Board>, id: string) {
-  return async () => {
-    await axios.delete('/api/boards/' + id);
-    const columns = boards[id].columns;
+function apiRemoveBoard(board: Board) {
+  return async (dispatch: AppDispatch) => {
+    await axios.delete('/api/boards/' + board.id);
+    const columns = board.columns;
     for (const column of columns) {
-      columnsActions.removeColumn(column.id);
+      dispatch(columnsActions.removeColumn(column.id));
     }
+    dispatch(boardsActions.removeBoard(board.id));
   };
 }
 

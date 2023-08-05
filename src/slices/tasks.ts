@@ -137,4 +137,23 @@ function apiMoveTask(boardId: string, destColumnId: string, task: Task) {
   };
 }
 
-export const tasksActions = { apiAddTask, apiUpdateTask, apiToggleSubtask, apiMoveTask, ...tasksSlice.actions };
+function apiRemoveTask(boardId: string, columnId: string, id: string) {
+  return async (dispatch: AppDispatch) => {
+    try {
+      await axios.delete(`/api/boards/${boardId}/columns/${columnId}/tasks/${id}`);
+      dispatch(tasksSlice.actions.removeTask(id));
+      dispatch(columnsActions.removeTaskIdFromColumn({ columnId, taskId: id }));
+    } catch (error) {
+      throw error;
+    }
+  };
+}
+
+export const tasksActions = {
+  apiAddTask,
+  apiUpdateTask,
+  apiToggleSubtask,
+  apiMoveTask,
+  apiRemoveTask,
+  ...tasksSlice.actions
+};

@@ -5,7 +5,7 @@ import TextField from '@/src/components/inputs/TextField';
 import DropDown from '@/src/components/inputs/DropDown';
 import { MouseEventHandler, useEffect, useState } from 'react';
 import ThemeSwitcher from '@/src/components/ThemeSwitcher';
-import Subtask from '@/src/components/Subtask';
+import Subtask from '@/src/components/Task/Subtask';
 import $toast, { $toastUpdate } from '@/src/libs/$toast';
 
 function Home() {
