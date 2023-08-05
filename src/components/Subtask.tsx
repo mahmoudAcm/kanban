@@ -1,5 +1,5 @@
 import { Box, Checkbox, styled, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const SubtaskRoot = styled(Box)(({ theme }) => ({
   background: theme.palette.background.default,
@@ -29,10 +29,15 @@ const SubtaskRoot = styled(Box)(({ theme }) => ({
 interface SubtaskProps {
   title: string;
   checked?: boolean;
+  onChange?: () => void;
 }
 
 export default function Subtask(props: SubtaskProps) {
   const [checked, setChecked] = useState(!!props.checked);
+
+  useEffect(() => {
+    setChecked(!!props.checked);
+  }, [props.checked]);
 
   return (
     <SubtaskRoot>
@@ -43,7 +48,10 @@ export default function Subtask(props: SubtaskProps) {
           color: 'var(--main-purple)',
           '--fill': theme => (theme.palette.__mode === 'DARK' ? theme.palette.background.default : 'white')
         }}
-        onChange={() => setChecked(prevState => !prevState)}
+        onChange={() => {
+          setChecked(prevState => !prevState);
+          if (props.onChange) props.onChange();
+        }}
         onKeyDown={event => {
           if (event.key === 'Enter') setChecked(prevState => !prevState);
         }}

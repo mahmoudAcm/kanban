@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Box, DialogContent, DialogTitle, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import DropDown from '@/src/components/inputs/DropDown';
-import { Form, Formik } from 'formik';
+import { Form, Formik, FormikHelpers } from 'formik';
 import Subtask from '@/src/components/Subtask';
 import VerticalDotsIcon from '@/src/icons/VerticalDotsIcon';
 import { useAppDispatch } from '@/src/store';
@@ -12,6 +12,8 @@ import useTasksSelector from '@/src/hooks/useTasksSelector';
 import useBoardsSelector from '@/src/hooks/useBoardsSelector';
 import { getTasksProps } from '@/src/components/Task';
 import AnimatedDialog from '@/src/components/Dialogs/AnimatedDialog';
+import { tasksActions } from '@/src/slices/tasks';
+import $toast, { $toastify } from '@/src/libs/$toast';
 
 export default function ViewTaskDetailsDialog() {
   const {
@@ -26,22 +28,57 @@ export default function ViewTaskDetailsDialog() {
     const columns = board?.columns ?? [];
     const columnId = task?.columnId ?? '';
     return columns.find(column => column.id == columnId)?.name ?? '';
-  }, [board, task]);
+  }, [board, task?.columnId]);
 
   if (!task) return <></>;
 
   const isMenuOpen = Boolean(anchorEl);
   const taskProps = getTasksProps(task);
 
+  const initialValues = {
+    currentStatus: { status, columnId: task?.columnId }
+  };
+
   const closeMenu = () => {
     setAnchorEl(null);
   };
+
+  const toggleSubtask = (id: string) => async () => {
+    try {
+      await dispatch(tasksActions.apiToggleSubtask(board?.id!, task?.columnId, task?.id, id));
+    } catch (error) {
+      const toastId = $toast('Oops! Something went wrong while toggling subtasks. Please try again later.', {
+        type: 'error',
+        onClose: () => {
+          $toastify.dismiss(toastId);
+        }
+      });
+    }
+  };
+
+  async function handleSubmit<Values extends typeof initialValues>(
+    { currentStatus }: Values,
+    actions: FormikHelpers<Values>
+  ) {
+    try {
+      await dispatch(tasksActions.apiMoveTask(board?.id!, currentStatus.columnId, currentStatus.status, task!));
+    } catch (error) {
+      const toastId = $toast('Oops! Something went wrong while moving the task. Please try again later.', {
+        type: 'error',
+        onClose: () => {
+          $toastify.dismiss(toastId);
+        }
+      });
+    }
+  }
 
   return (
     <AnimatedDialog
       open={show}
       fullWidth
       onClose={() => {
+        $toastify.dismiss();
+        $toastify.clearWaitingQueue();
         dispatch(dialogsActions.closeDialog(DIALOG_IDS.VIEW_TASK_DIALOG));
       }}
       keepMounted
@@ -63,15 +100,7 @@ export default function ViewTaskDetailsDialog() {
           <VerticalDotsIcon sx={{ width: '20px !important' }} />
         </IconButton>
       </DialogTitle>
-      <Formik
-        initialValues={{
-          currentStatus: status
-        }}
-        // validationSchema={schema}
-        onSubmit={(values, actions) => {
-          console.log(values);
-        }}
-      >
+      <Formik initialValues={initialValues} key={task.status} onSubmit={handleSubmit}>
         {props => (
           <Form>
             <DialogContent sx={{ mt: '24px', pb: '32px !important' }}>
@@ -86,16 +115,27 @@ export default function ViewTaskDetailsDialog() {
                 </Typography>
                 <Box sx={{ display: 'grid', gap: '8px', mt: '16px' }}>
                   {task?.subtasks.map(subtask => (
-                    <Subtask key={subtask.id} title={subtask.title} checked={subtask.isCompleted} />
+                    <Subtask
+                      key={subtask.id}
+                      title={subtask.title}
+                      checked={subtask.isCompleted}
+                      onChange={toggleSubtask(subtask.id)}
+                    />
                   ))}
                 </Box>
               </Box>
-              <DropDown label='Current Status' fullWidth value={props.values.currentStatus}>
+              <DropDown label='Current Status' fullWidth value={props.values.currentStatus.status}>
                 {board?.columns.map(column => (
                   <MenuItem
                     key={column.id}
                     value={column.name}
-                    onClick={() => props.getFieldHelpers('currentStatus').setValue(column.name)}
+                    onClick={async () => {
+                      props.getFieldHelpers('currentStatus').setValue({
+                        status: column.name,
+                        columnId: column.id
+                      });
+                      await props.submitForm();
+                    }}
                   >
                     {column.name}
                   </MenuItem>

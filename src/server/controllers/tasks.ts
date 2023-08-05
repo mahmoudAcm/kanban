@@ -66,8 +66,7 @@ export async function createTask(req: NextApiRequest, res: NextApiResponse) {
       data: {
         ...data,
         subtasks: undefined,
-        columnId,
-        status: column.name
+        columnId
       }
     });
 

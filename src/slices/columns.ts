@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { tasksActions } from '@/src/slices/tasks';
+import { AppDispatch } from '@/src/store';
 
 export const columnsSlice = createSlice({
   name: '__columns',
@@ -32,6 +33,13 @@ export const columnsSlice = createSlice({
   }
 });
 
+function moveTaskBetweenColumns(srcColumnId: string, destColumnId: string, taskId: string) {
+  return async (dispatch: AppDispatch) => {
+    dispatch(columnsActions.removeTaskIdFromColumn({ columnId: srcColumnId, taskId }));
+    dispatch(columnsActions.addTaskIdToColumn({ columnId: destColumnId, taskId }));
+  };
+}
+
 export const columnsReducer = columnsSlice.reducer;
 
-export const columnsActions = { ...columnsSlice.actions };
+export const columnsActions = { moveTaskBetweenColumns, ...columnsSlice.actions };

@@ -22,7 +22,6 @@ export async function moveTaskMiddleware(req: NextApiRequest) {
 
     return prisma.task.update({
       data: {
-        status: newColumn.name,
         columnId: newColumn.id
       },
       where: { id: taskId },
