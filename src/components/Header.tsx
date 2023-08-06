@@ -168,7 +168,7 @@ export default function Header() {
             setNavigationOpen(prevState => !prevState);
           }}
         >
-          <span>{boardName}</span>
+          <span>{boardName ?? 'No Board Was Found'}</span>
           <svg
             xmlns='http://www.w3.org/2000/svg'
             width='11'
