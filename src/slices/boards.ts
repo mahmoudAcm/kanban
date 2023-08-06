@@ -65,6 +65,7 @@ export const boardsSlice = createSlice({
     removeBoard(state, action: PayloadAction<string>) {
       const id = action.payload;
       delete state.boards[id];
+      state.count = Math.max(state.count - 1, 0);
     }
   }
 });
