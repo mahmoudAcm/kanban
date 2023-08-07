@@ -7,6 +7,8 @@ import useBoardsSelector from '@/src/hooks/useBoardsSelector';
 import { useActiveColumnsSelector } from '@/src/hooks/useColumnsSelector';
 import useTasksSelector from '@/src/hooks/useTasksSelector';
 import EmptyBoard from '@/src/components/Board/EmptyBoard';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 export const BoardRoot = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -64,8 +66,17 @@ export default function Board() {
   const columns = useActiveColumnsSelector();
   const tasks = useTasksSelector(({ tasks }) => tasks);
   const board = useBoardsSelector(({ boards, activeBoardId }) => boards[activeBoardId]);
+  const isBoardsReady = useBoardsSelector(({ isBoardsReady }) => isBoardsReady);
+  const router = useRouter();
 
   console.log('board is rendered');
+
+  //isBoardsReady will be false if the user has no boards
+  useEffect(() => {
+    if (!isBoardsReady) {
+      router.push('/boards').then();
+    }
+  }, [router, isBoardsReady]);
 
   if (!board) return <></>;
 

@@ -1,5 +1,6 @@
 import { NextApiRequest } from 'next';
 import prisma from '@/src/libs/prisma';
+import isAuthenticated from '@/src/server/middlewares/auth';
 
 export async function moveTaskMiddleware(req: NextApiRequest) {
   const data = req.body;
@@ -9,8 +10,10 @@ export async function moveTaskMiddleware(req: NextApiRequest) {
 
   if (!data.destinationColumnId) return {};
 
+  const userId = isAuthenticated(req);
+
   if (sourceColumnId !== data.destinationColumnId) {
-    const newColumn = await prisma.column.findUniqueOrThrow({ where: { id: data.destinationColumnId } });
+    const newColumn = await prisma.column.findUniqueOrThrow({ where: { id: data.destinationColumnId, userId } });
 
     if (newColumn.boardId !== boardId) {
       (() => {
@@ -24,7 +27,7 @@ export async function moveTaskMiddleware(req: NextApiRequest) {
       data: {
         columnId: newColumn.id
       },
-      where: { id: taskId },
+      where: { id: taskId, userId },
       include: {
         subtasks: true
       }

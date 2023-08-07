@@ -1,7 +1,8 @@
 import { Avatar, Box, Menu, MenuItem, styled, Typography } from '@mui/material';
 import { Roboto } from 'next/font/google';
 import HorizontalDotsIcon from '@/src/icons/HorizontalDotsIcon';
-import { MouseEvent, useId, useState } from 'react';
+import { MouseEvent, useEffect, useId, useRef, useState } from 'react';
+import { SignOutButton, useUser } from '@clerk/nextjs';
 
 const robotoFont = Roboto({
   weight: ['400', '700'],
@@ -34,8 +35,15 @@ const ProfileCardRoot = styled(Box)(({ theme }) => ({
 
 const StyledTypography = styled(Typography)(({ theme }) => ({
   ...robotoFont.style,
+  width: '20ch',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
   '&.name': {
     transition: theme.transitions.create('color')
+  },
+  [theme.breakpoints.down('md')]: {
+    width: '18ch'
   }
 }));
 
@@ -43,6 +51,8 @@ export default function ProfileCard() {
   const id = useId();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const { user } = useUser();
+  const userRef = useRef<typeof user>();
 
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
@@ -54,6 +64,16 @@ export default function ProfileCard() {
     }
     setAnchorEl(null);
   };
+
+  useEffect(() => {
+    if (user?.primaryEmailAddress?.emailAddress && user.fullName) {
+      userRef.current = user;
+    }
+  }, [user]);
+
+  const email = (userRef.current ?? user)?.primaryEmailAddress?.emailAddress;
+  const fullName = (userRef.current ?? user)?.fullName;
+  const imageUrl = (userRef.current ?? user)?.imageUrl ?? '';
 
   return (
     <>
@@ -73,7 +93,7 @@ export default function ProfileCard() {
         PaperProps={{
           sx: {
             mt: '-9px',
-            width: 273,
+            minWidth: 273,
             overflow: 'visible',
             // boxShadow: '0px 0px 13px -2px rgba(54, 78, 126, 0.25)',
             background: theme => (theme.palette.__mode === 'DARK' ? theme.palette.background.default : 'white'),
@@ -82,7 +102,7 @@ export default function ProfileCard() {
               display: 'block',
               position: 'absolute',
               bottom: -10,
-              left: (273 - 10) / 2,
+              left: '50%',
               width: 10,
               height: 10,
               background: theme => (theme.palette.__mode === 'DARK' ? theme.palette.background.default : 'white'),
@@ -96,7 +116,9 @@ export default function ProfileCard() {
         }}
       >
         <MenuItem onClick={handleClose}>Add an existing account</MenuItem>
-        <MenuItem onClick={handleClose}>Log out @Mahmoud03066050</MenuItem>
+        <SignOutButton>
+          <MenuItem>Log out {email}</MenuItem>
+        </SignOutButton>
       </Menu>
       <ProfileCardRoot
         id={id + 'profile-button'}
@@ -109,13 +131,19 @@ export default function ProfileCard() {
           if (event.key === 'Enter') setAnchorEl(event.currentTarget);
         }}
       >
-        <Avatar src='/images/profile.svg' sx={{ width: '38px', height: '38px' }} alt='' />
+        <Avatar src={imageUrl} sx={{ width: '38px', height: '38px' }} alt='' />
         <Box sx={{ display: 'grid', gap: '5px', flex: 1, userSelect: 'none' }}>
           <StyledTypography sx={{ fontSize: '0.8125rem', lineHeight: 15 / 13, fontWeight: 600 }} className='name'>
-            Mahmoud Tarek
+            {fullName}
           </StyledTypography>
-          <StyledTypography sx={{ fontSize: '0.75rem', lineHeight: 15 / 12, color: 'var(--medium-grey)' }}>
-            @Mahmoud03066050
+          <StyledTypography
+            sx={{
+              fontSize: '0.75rem',
+              lineHeight: 15 / 12,
+              color: 'var(--medium-grey)'
+            }}
+          >
+            {email}
           </StyledTypography>
         </Box>
         <HorizontalDotsIcon />

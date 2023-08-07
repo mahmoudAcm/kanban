@@ -42,7 +42,8 @@ export const boardsSlice = createSlice({
         index++;
       }
       state.count = boards.length;
-      state.isBoardsReady = true;
+
+      if (state.count) state.isBoardsReady = true;
     },
     setActiveBoardId(state, action: PayloadAction<string>) {
       state.activeBoardId = action.payload;
@@ -66,6 +67,7 @@ export const boardsSlice = createSlice({
       const id = action.payload;
       delete state.boards[id];
       state.count = Math.max(state.count - 1, 0);
+      if (!state.count) state.isBoardsReady = false;
     }
   }
 });
@@ -90,7 +92,7 @@ function apiInitiateBoards() {
       }
     }
     dispatch(boardsSlice.actions.initiateBoard(data));
-    return data?.[0].id;
+    return data?.[0]?.id;
   };
 }
 
@@ -102,7 +104,6 @@ function apiAddBoard(board: { name: string; columns: { name: string }[] }) {
       dispatch(boardsSlice.actions.updateOrAddBoard(data.board));
       dispatch(boardsSlice.actions.increaseCount());
       dispatch(columnsActions.updateOrAddColumns(data.board.columns.map(({ id }) => id)));
-      return data.message;
     } catch (error) {
       throw error;
     }

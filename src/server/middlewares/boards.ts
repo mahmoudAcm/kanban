@@ -1,9 +1,10 @@
 import prisma from '@/src/libs/prisma';
 
-export async function getBoardMiddleware(id: string) {
+export async function getBoardMiddleware(id: string, userId: string) {
   return prisma.board.findUnique({
     where: {
-      id
+      id,
+      userId
     },
     include: {
       columns: {

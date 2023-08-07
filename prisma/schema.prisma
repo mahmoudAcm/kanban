@@ -15,12 +15,14 @@ model Board {
   id      String   @unique @default(cuid())
   name    String
   columns Column[]
+  userId  String
 }
 
 model Column {
-  id    String @unique @default(cuid())
-  name  String
-  tasks Task[]
+  id     String @unique @default(cuid())
+  name   String
+  tasks  Task[]
+  userId String
 
   Board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade)
   boardId String
@@ -33,6 +35,7 @@ model Task {
   title       String
   description String?   @db.LongText()
   subtasks    SubTask[]
+  userId      String
 
   Column   Column @relation(fields: [columnId], references: [id], onDelete: Cascade)
   columnId String
@@ -44,6 +47,7 @@ model SubTask {
   id          String  @unique @default(cuid())
   title       String
   isCompleted Boolean @default(false)
+  userId      String
 
   Task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
   taskId String

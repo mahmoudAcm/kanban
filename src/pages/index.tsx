@@ -125,5 +125,6 @@ function Home() {
 }
 
 Home.authGuard = process.env.NODE_ENV === 'production';
+Home.guestGuard = true;
 
 export default Home;

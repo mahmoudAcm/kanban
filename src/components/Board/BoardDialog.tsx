@@ -26,6 +26,7 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import $sleep from '@/src/libs/$sleep';
 import $toast, { $toastify, $toastUpdate } from '@/src/libs/$toast';
+import { useRouter } from 'next/router';
 
 const schema = yup.object({
   name: yup.string().required("Can't be blank").min(3, 'Must be at least 3 characters.'),
@@ -46,6 +47,7 @@ export default function BoardDialog() {
   const {
     [DIALOG_IDS.BOARD_DIALOG]: { show, type }
   } = useDialogsSelector();
+  const router = useRouter();
   const board = useBoardsSelector(({ boards, activeBoardId }) => boards[activeBoardId]);
   const isSubmittingRef = useRef(false);
   const scrollRef = useRef<HTMLElement | null>(null);
@@ -71,11 +73,11 @@ export default function BoardDialog() {
 
   const closeDialog = useCallback(
     function () {
-      if (isSubmittingRef.current) return;
+      if (isSubmittingRef.current || (router.isReady && router.pathname === '/boards')) return;
       dispatch(dialogsActions.closeDialog(DIALOG_IDS.BOARD_DIALOG));
       if (toastIdRef.current) $toastify.dismiss(toastIdRef.current);
     },
-    [dispatch]
+    [dispatch, router]
   );
 
   const handleSubmit = useCallback(
@@ -105,6 +107,11 @@ export default function BoardDialog() {
             })
           );
           actions.resetForm();
+
+          //if no boards were found and i'm in the boards page after i create the first board i will be redirected to the first  board route
+          if (router.isReady && router.pathname === '/boards') {
+            await router.reload();
+          }
         }
 
         if (type === 'edit') {
@@ -149,7 +156,7 @@ export default function BoardDialog() {
         if (scrollRef.current) scrollRef.current.scrollTop = 0;
       }
     },
-    [board?.id, closeDialog, dispatch, type]
+    [board?.id, closeDialog, dispatch, type, router]
   );
 
   useEffect(() => {

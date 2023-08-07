@@ -1,13 +1,19 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from 'next';
 import prisma from '@/src/libs/prisma';
 import { Prisma } from '@prisma/client';
 import * as yup from 'yup';
-import { PayloadError } from '@/src/server/libs/customErrors';
 import { InferType } from 'yup';
+import { HTTPNotAuthorizedError, PayloadError } from '@/src/server/libs/customErrors';
 import { getBoardMiddleware } from '@/src/server/middlewares/boards';
+import isAuthenticated from '@/src/server/middlewares/auth';
 
-export async function getFirstBoardId() {
+export async function getFirstBoardId(req: GetServerSidePropsContext['req']) {
+  const userId = isAuthenticated(req as NextApiRequest);
+
   const board = await prisma.board.findFirst({
+    where: {
+      userId
+    },
     select: {
       id: true
     }
@@ -18,7 +24,10 @@ export async function getFirstBoardId() {
 
 export async function getBoards(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const userId = isAuthenticated(req);
+
     const boards = await prisma.board.findMany({
+      where: { userId },
       include: {
         columns: {
           include: {
@@ -34,15 +43,17 @@ export async function getBoards(req: NextApiRequest, res: NextApiResponse) {
 
     res.json(boards);
   } catch (error: any) {
+    if (error instanceof HTTPNotAuthorizedError) return res.status(401).json(error.getError());
     res.status(400).json({ message: error.message });
   }
 }
 
 export async function getBoard(req: NextApiRequest, res: NextApiResponse) {
   try {
+    const userId = isAuthenticated(req);
     const boardId = req.query.boardId as string;
     const board = await prisma.board.findUniqueOrThrow({
-      where: { id: boardId },
+      where: { id: boardId, userId },
       include: {
         columns: {
           include: {
@@ -58,6 +69,7 @@ export async function getBoard(req: NextApiRequest, res: NextApiResponse) {
 
     res.json(board);
   } catch (error: any) {
+    if (error instanceof HTTPNotAuthorizedError) return res.status(401).json(error.getError());
     if (error instanceof Prisma.PrismaClientKnownRequestError)
       return res
         .status(error.code === 'P2025' ? 404 : 400)
@@ -86,20 +98,24 @@ export async function createBoard(req: NextApiRequest, res: NextApiResponse) {
       abortEarly: false
     });
 
+    const userId = isAuthenticated(req);
+
     const newBoard = await prisma.board.create({
       data: {
-        name: data.name
+        name: data.name,
+        userId
       }
     });
 
     await prisma.column.createMany({
-      data: data.columns?.map(column => ({ boardId: newBoard.id, ...column })) ?? []
+      data: data.columns?.map(column => ({ boardId: newBoard.id, ...column, userId })) ?? []
     });
 
-    const board = await getBoardMiddleware(newBoard.id);
+    const board = await getBoardMiddleware(newBoard.id, userId);
 
     res.status(201).json({ message: data.name + ' board was created.', board });
   } catch (error: any) {
+    if (error instanceof HTTPNotAuthorizedError) return res.status(401).json(error.getError());
     if (error instanceof yup.ValidationError) return res.status(400).json(PayloadError.getError(error));
     res.status(400).json({ message: error.message });
   }
@@ -124,13 +140,16 @@ export async function updateBoard(req: NextApiRequest, res: NextApiResponse) {
       abortEarly: false
     });
 
+    const userId = isAuthenticated(req);
+
     if (data.name)
       await prisma.board.update({
         data: {
           name: data.name
         },
         where: {
-          id: boardId
+          id: boardId,
+          userId
         }
       });
 
@@ -143,7 +162,8 @@ export async function updateBoard(req: NextApiRequest, res: NextApiResponse) {
           name: column.name
         },
         where: {
-          id: column.id
+          id: column.id,
+          userId
         }
       });
     }
@@ -153,18 +173,20 @@ export async function updateBoard(req: NextApiRequest, res: NextApiResponse) {
         boardId,
         id: {
           notIn: columnsWithId.map(column => column.id!)
-        }
+        },
+        userId
       }
     });
 
     await prisma.column.createMany({
-      data: columnsWithoutId.map(column => ({ boardId, ...column }))
+      data: columnsWithoutId.map(column => ({ boardId, ...column, userId }))
     });
 
-    const board = await getBoardMiddleware(boardId);
+    const board = await getBoardMiddleware(boardId, userId);
 
     res.status(200).json({ message: data.name + ' board was updated.', board });
   } catch (error: any) {
+    if (error instanceof HTTPNotAuthorizedError) return res.status(401).json(error.getError());
     if (error instanceof yup.ValidationError) return res.status(400).json(PayloadError.getError(error));
     if (error instanceof Prisma.PrismaClientKnownRequestError)
       return res
@@ -177,15 +199,18 @@ export async function updateBoard(req: NextApiRequest, res: NextApiResponse) {
 export async function deleteBoard(req: NextApiRequest, res: NextApiResponse) {
   try {
     const boardId = req.query.boardId as string;
+    const userId = isAuthenticated(req);
 
     await prisma.board.delete({
       where: {
-        id: boardId
+        id: boardId,
+        userId
       }
     });
 
     res.json({ message: 'Board was deleted.' });
   } catch (error: any) {
+    if (error instanceof HTTPNotAuthorizedError) return res.status(401).json(error.getError());
     if (error instanceof Prisma.PrismaClientKnownRequestError)
       return res
         .status(error.code === 'P2025' ? 404 : 400)

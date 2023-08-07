@@ -20,7 +20,13 @@ function BoardPage() {
   const isBoardsReady = useBoardsSelector(({ isBoardsReady }) => isBoardsReady);
 
   useEffect(() => {
-    if (!isBoardsReady) dispatch(boardsActions.apiInitiateBoards()).then();
+    if (!isBoardsReady)
+      dispatch(boardsActions.apiInitiateBoards()).then(async id => {
+        if (!id) {
+          await router.push('/boards');
+        }
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, isBoardsReady]);
 
   useEffect(() => {
@@ -32,7 +38,7 @@ function BoardPage() {
   return (
     <Box sx={{ height: 'max(400px, 100%)' }}>
       <Head>
-        <title>App</title>
+        <title>Kanban App</title>
       </Head>
       <BoardDialog />
       <TaskDialog />
@@ -46,6 +52,6 @@ function BoardPage() {
 
 BoardPage.getLayout = (page: ReactNode) => <MainLayout>{page}</MainLayout>;
 
-BoardPage.authGuard = process.env.NODE_ENV === 'production';
+BoardPage.authGuard = true;
 
 export default BoardPage;
