@@ -7,13 +7,15 @@ export default authMiddleware({
       return NextResponse.next();
     }
 
+    const redirectTo = req.nextUrl.origin + '/boards';
+
     // handle users who aren't authenticated
     if (!auth.userId && !auth.isPublicRoute) {
-      return redirectToSignIn({ returnBackUrl: req.url });
+      return redirectToSignIn({ returnBackUrl: redirectTo });
     }
 
     if (auth.userId && req.nextUrl.pathname.startsWith('/auth')) {
-      const appUrl = new URL('/boards', req.url);
+      const appUrl = new URL('/boards', redirectTo);
       return NextResponse.redirect(appUrl);
     }
   }

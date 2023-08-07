@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import useTasksSelector from '@/src/hooks/useTasksSelector';
 import { tasksActions } from '@/src/slices/tasks';
 import $toast, { $toastify } from '@/src/libs/$toast';
+import { AxiosError } from 'axios';
 
 export default function DeleteTaskDialog() {
   const dispatch = useAppDispatch();
@@ -49,7 +50,23 @@ export default function DeleteTaskDialog() {
           handleClose();
         } catch (error) {
           console.log(error);
-          const toastId = $toast('Oops! Something went wrong while deleting the task. Please try again later.', {
+
+          let toastId: any;
+
+          if (error instanceof AxiosError && error.response?.status === 401) {
+            toastId = $toast(
+              'You do not have permission to delete the task. Please log in or check your credentials.',
+              {
+                type: 'error',
+                onClose: () => {
+                  $toastify.dismiss(toastId);
+                }
+              }
+            );
+            return;
+          }
+
+          toastId = $toast('Oops! Something went wrong while deleting the task. Please try again later.', {
             type: 'error',
             onClose: () => {
               $toastify.dismiss(toastId);

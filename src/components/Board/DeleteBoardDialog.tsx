@@ -7,6 +7,7 @@ import { dialogsActions } from '@/src/slices/dialogs';
 import { boardsActions } from '@/src/slices/boards';
 import { useEffect, useRef, useState } from 'react';
 import $toast, { $toastify } from '@/src/libs/$toast';
+import { AxiosError } from 'axios';
 
 export default function DeleteBoardDialog() {
   const dispatch = useAppDispatch();
@@ -48,7 +49,23 @@ export default function DeleteBoardDialog() {
           handleClose();
         } catch (error) {
           console.log(error);
-          const toastId = $toast('Oops! Something went wrong while deleting the board. Please try again later.', {
+
+          let toastId: any;
+
+          if (error instanceof AxiosError && error.response?.status === 401) {
+            toastId = $toast(
+              'You do not have permission to delete the board. Please log in or check your credentials.',
+              {
+                type: 'error',
+                onClose: () => {
+                  $toastify.dismiss(toastId);
+                }
+              }
+            );
+            return;
+          }
+
+          toastId = $toast('Oops! Something went wrong while deleting the board. Please try again later.', {
             type: 'error',
             onClose: () => {
               $toastify.dismiss(toastId);

@@ -49,7 +49,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     console.log(error);
     return {
       redirect: {
-        destination: '/auth/signin',
+        destination: 'https://selected-airedale-49.accounts.dev/sign-in',
         permanent: false
       }
     };

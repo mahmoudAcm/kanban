@@ -29,6 +29,7 @@ import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import $toast, { $toastify, $toastUpdate } from '@/src/libs/$toast';
 import { tasksActions } from '@/src/slices/tasks';
+import { AxiosError } from 'axios';
 
 const schema = yup.object({
   title: yup.string().min(3, 'Must be at least 3 characters').required("Can't be blank"),
@@ -132,6 +133,18 @@ export default function TaskDialog() {
       console.log(error);
 
       setStatusCode(400);
+
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        $toastUpdate(toastIdRef.current, {
+          isLoading: false,
+          type: 'error',
+          message: `You do not have permission to ${type} the task. Please log in or check your credentials.`,
+          onClose: () => {
+            if (toastIdRef.current) $toastify.dismiss(toastIdRef.current);
+          }
+        });
+        return;
+      }
 
       $toastUpdate(toastIdRef.current, {
         isLoading: false,

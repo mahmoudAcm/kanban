@@ -14,6 +14,7 @@ import { getTasksProps } from '@/src/components/Task/Task';
 import AnimatedDialog from '@/src/components/Dialogs/AnimatedDialog';
 import { tasksActions } from '@/src/slices/tasks';
 import $toast, { $toastify } from '@/src/libs/$toast';
+import { AxiosError } from 'axios';
 
 export default function ViewTaskDetailsDialog() {
   const {
@@ -47,7 +48,22 @@ export default function ViewTaskDetailsDialog() {
     try {
       await dispatch(tasksActions.apiToggleSubtask(board?.id!, task?.columnId, task?.id, id));
     } catch (error) {
-      const toastId = $toast('Oops! Something went wrong while toggling subtasks. Please try again later.', {
+      let toastId: any;
+
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        toastId = $toast(
+          'You do not have permission to toggle this subtask. Please log in or check your credentials.',
+          {
+            type: 'error',
+            onClose: () => {
+              $toastify.dismiss(toastId);
+            }
+          }
+        );
+        return;
+      }
+
+      toastId = $toast('Oops! Something went wrong while toggling subtasks. Please try again later.', {
         type: 'error',
         onClose: () => {
           $toastify.dismiss(toastId);
@@ -63,7 +79,19 @@ export default function ViewTaskDetailsDialog() {
     try {
       await dispatch(tasksActions.apiMoveTask(board?.id!, currentStatus.columnId, task!));
     } catch (error) {
-      const toastId = $toast('Oops! Something went wrong while moving the task. Please try again later.', {
+      let toastId: any;
+
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        toastId = $toast('You do not have permission to move the task. Please log in or check your credentials.', {
+          type: 'error',
+          onClose: () => {
+            $toastify.dismiss(toastId);
+          }
+        });
+        return;
+      }
+
+      toastId = $toast('Oops! Something went wrong while moving the task. Please try again later.', {
         type: 'error',
         onClose: () => {
           $toastify.dismiss(toastId);

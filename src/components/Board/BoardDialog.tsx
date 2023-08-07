@@ -27,6 +27,7 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 import $sleep from '@/src/libs/$sleep';
 import $toast, { $toastify, $toastUpdate } from '@/src/libs/$toast';
 import { useRouter } from 'next/router';
+import { AxiosError } from 'axios';
 
 const schema = yup.object({
   name: yup.string().required("Can't be blank").min(3, 'Must be at least 3 characters.'),
@@ -139,6 +140,18 @@ export default function BoardDialog() {
         console.log(error);
 
         setStatusCode(400);
+
+        if (error instanceof AxiosError && error.response?.status === 401) {
+          $toastUpdate(toastIdRef.current, {
+            isLoading: false,
+            type: 'error',
+            message: `You do not have permission to ${type} the board. Please log in or check your credentials.`,
+            onClose: () => {
+              if (toastIdRef.current) $toastify.dismiss(toastIdRef.current);
+            }
+          });
+          return;
+        }
 
         $toastUpdate(toastIdRef.current, {
           isLoading: false,
