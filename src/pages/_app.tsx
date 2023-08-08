@@ -4,7 +4,7 @@ import { CacheProvider } from '@emotion/react';
 import { Backdrop, Box, CircularProgress, CssBaseline } from '@mui/material';
 import type { AppProps as DefaultAppProps } from 'next/app';
 import createEmotionCache from '../libs/createEmotionCache';
-import { FunctionComponent, ReactNode } from 'react';
+import { FunctionComponent, ReactNode, useEffect } from 'react';
 import { NextPage } from 'next';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -13,6 +13,7 @@ import { Provider } from 'react-redux';
 import store from '@/src/store';
 import { PageLoadingProvider } from '@/src/contexts/PageLoadingContext';
 import { ClerkProvider, useAuth } from '@clerk/nextjs';
+import { useRouter } from 'next/router';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -24,6 +25,21 @@ interface AuthenticatedProps {
 
 const Authenticated = ({ children, authGuard, guestGuard }: AuthenticatedProps) => {
   const { isSignedIn, isLoaded } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    const onFocus = async () => {
+      if (!isSignedIn && isLoaded && authGuard) await router.reload();
+    };
+
+    onFocus().then();
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      window.removeEventListener('focus', onFocus);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router, isSignedIn, isLoaded]);
 
   if (!isLoaded)
     return (
