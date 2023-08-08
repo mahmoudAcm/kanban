@@ -50,7 +50,7 @@ export const AddNewColumnButton = styled(Box)(({ theme }) => ({
   '& h1': {
     transition: theme.transitions.create('color')
   },
-  '&:hover h1': {
+  '&:hover, &:hover h1': {
     color: 'var(--main-purple)',
     cursor: 'pointer'
   }
@@ -111,14 +111,14 @@ export default function Board() {
           </Column>
         );
       })}
-      <AddNewColumnButton role='button' aria-label='Add New Column'>
-        <Typography
-          variant='h1'
-          color='var(--medium-grey)'
-          onClick={() => {
-            dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.BOARD_DIALOG, type: 'edit' }));
-          }}
-        >
+      <AddNewColumnButton
+        role='button'
+        aria-label='Add New Column'
+        onClick={() => {
+          dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.BOARD_DIALOG, type: 'edit' }));
+        }}
+      >
+        <Typography variant='h1' color='var(--medium-grey)'>
           + New Column
         </Typography>
       </AddNewColumnButton>
