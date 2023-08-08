@@ -1,19 +1,21 @@
 import { SignUp } from '@clerk/clerk-react';
-import { ReactNode, useEffect } from 'react';
+import { ReactNode } from 'react';
 import Head from 'next/head';
 import AuthLayout from '@/src/components/layouts/AuthLayout';
-import { useAuth } from '@clerk/nextjs';
-import { useRouter } from 'next/router';
+import { clerkAppearanceElements } from '@/src/components/Auth/clerkStyles';
 
 function Signup() {
-  const { isLoaded, isSignedIn } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (isSignedIn && isLoaded) router.reload();
-  }, [router, isSignedIn, isLoaded]);
-
-  return <SignUp redirectUrl='/boards' />;
+  return (
+    <SignUp
+      redirectUrl='/boards'
+      appearance={{
+        layout: {
+          logoImageUrl: '/images/auth/favicon.svg'
+        },
+        elements: clerkAppearanceElements
+      }}
+    />
+  );
 }
 
 Signup.guestGuard = true;
@@ -21,6 +23,7 @@ Signup.guestGuard = true;
 Signup.getLayout = (page: ReactNode) => (
   <AuthLayout>
     <Head>
+      <link rel='shortcut icon' href='/images/auth/favicon.svg' />
       <title>Kanban - Create Your Kanban Task Management Account</title>
     </Head>
     {page}
