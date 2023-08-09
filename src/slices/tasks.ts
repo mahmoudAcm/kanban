@@ -21,24 +21,28 @@ type Task = {
 export const tasksSlice = createSlice({
   name: '__tasks',
   initialState: {
-    tasks: {} as Record<string, Task>,
-    activeTaskId: ''
+    tasksOf: {} as Record<string, Record<string, Task>>,
+    activeTask: {
+      id: '',
+      columnId: ''
+    }
   },
   reducers: {
     updateOrAddTask(state, action: PayloadAction<Task>) {
       const task = action.payload;
-      state.tasks[task.id] = task;
+      if (!state.tasksOf?.[task.columnId]) state.tasksOf[task.columnId] = {};
+      state.tasksOf[task.columnId][task.id] = task;
     },
-    removeTask(state, action: PayloadAction<string>) {
-      const id = action.payload;
-      delete state.tasks[id];
+    removeTask(state, action: PayloadAction<{ id: string; columnId: string }>) {
+      const { id, columnId } = action.payload;
+      if (state.tasksOf[columnId]) delete state.tasksOf[columnId][id];
     },
-    setActiveTaskId(state, action: PayloadAction<string>) {
-      state.activeTaskId = action.payload;
+    setActiveTaskId(state, action: PayloadAction<{ id: string; columnId: string }>) {
+      state.activeTask = action.payload;
     },
-    toggleSubtask(state, action: PayloadAction<{ taskId: string; id: string }>) {
-      const { taskId, id } = action.payload;
-      const task = state.tasks?.[taskId];
+    toggleSubtask(state, action: PayloadAction<{ id: string; taskId: string; columnId: string }>) {
+      const { columnId, taskId, id } = action.payload;
+      const task = state.tasksOf?.[columnId]?.[taskId];
       if (task) {
         const subtaskIndex = task.subtasks.findIndex(subtask => subtask.id === id);
         if (subtaskIndex !== -1) {
@@ -46,11 +50,17 @@ export const tasksSlice = createSlice({
         }
       }
     },
-    moveTask(state, action: PayloadAction<{ id: string; destColumnId: string }>) {
-      const { id, destColumnId } = action.payload;
-      const task = state.tasks?.[id];
+    moveTask(state, action: PayloadAction<{ id: string; srcColumnId: string; destColumnId: string }>) {
+      const { id, srcColumnId, destColumnId } = action.payload;
+      const task = state.tasksOf?.[srcColumnId]?.[id];
       if (task) {
+        if (!state.tasksOf?.[destColumnId]) state.tasksOf[destColumnId] = {};
         task.columnId = destColumnId;
+        delete state.tasksOf?.[srcColumnId]?.[id];
+        state.tasksOf[destColumnId][id] = task;
+        if (state.activeTask.id === task.id) {
+          state.activeTask.columnId = destColumnId;
+        }
       }
     }
   }
@@ -73,7 +83,7 @@ function apiAddTask(
       const { task } = res.data;
 
       dispatch(tasksSlice.actions.updateOrAddTask(task));
-      dispatch(columnsActions.addTaskIdToColumn({ columnId, taskId: task.id }));
+      dispatch(columnsActions.addTaskIdToColumn({ boardId, columnId, taskId: task.id }));
     } catch (error) {
       throw error;
     }
@@ -82,7 +92,8 @@ function apiAddTask(
 
 function apiUpdateTask(
   boardId: string,
-  columnId: string,
+  srcColumnId: string,
+  destColumnId: string,
   id: string,
   newTask: {
     title: string;
@@ -92,15 +103,24 @@ function apiUpdateTask(
 ) {
   return async (dispatch: AppDispatch) => {
     try {
-      const res = await axios.put<Task>(`/api/boards/${boardId}/columns/${columnId}/tasks/${id}`, newTask);
+      const res = await axios.put<Task>(`/api/boards/${boardId}/columns/${srcColumnId}/tasks/${id}`, {
+        ...newTask,
+        newColumnId: destColumnId
+      });
       const task = res.data;
 
       dispatch(tasksSlice.actions.updateOrAddTask(task));
 
       //if the column id changed means we updated the task status
-      if (task.columnId !== columnId) {
-        await dispatch(columnsActions.moveTaskBetweenColumns(columnId, task.columnId, task.id));
-        dispatch(tasksSlice.actions.moveTask({ destColumnId: task.columnId, id: task.id }));
+      if (destColumnId !== srcColumnId) {
+        await dispatch(columnsActions.moveTaskBetweenColumns(boardId, srcColumnId, destColumnId, task.id));
+        dispatch(
+          tasksSlice.actions.moveTask({
+            srcColumnId,
+            destColumnId,
+            id: task.id
+          })
+        );
       }
     } catch (error) {
       throw error;
@@ -111,11 +131,11 @@ function apiUpdateTask(
 function apiToggleSubtask(boardId: string, columnId: string, taskId: string, id: string) {
   return async (dispatch: AppDispatch) => {
     try {
-      dispatch(tasksSlice.actions.toggleSubtask({ taskId, id }));
+      dispatch(tasksSlice.actions.toggleSubtask({ taskId, id, columnId }));
       await axios.patch(`/api/boards/${boardId}/columns/${columnId}/tasks/${taskId}/subtasks/${id}`);
     } catch (error) {
       //revert back to the previous state if toggling failed
-      dispatch(tasksSlice.actions.toggleSubtask({ taskId, id }));
+      dispatch(tasksSlice.actions.toggleSubtask({ taskId, id, columnId }));
       throw error;
     }
   };
@@ -125,8 +145,8 @@ function apiMoveTask(boardId: string, destColumnId: string, task: Task) {
   return async (dispatch: AppDispatch) => {
     const srcColumnId = task.columnId;
     try {
-      await dispatch(columnsActions.moveTaskBetweenColumns(srcColumnId, destColumnId, task.id));
-      dispatch(tasksSlice.actions.moveTask({ destColumnId, id: task.id }));
+      await dispatch(columnsActions.moveTaskBetweenColumns(boardId, srcColumnId, destColumnId, task.id));
+      dispatch(tasksSlice.actions.moveTask({ srcColumnId, destColumnId, id: task.id }));
 
       await axios.patch(`/api/boards/${boardId}/columns/${srcColumnId}/tasks/${task.id}`, {
         destinationColumnId: destColumnId
@@ -141,8 +161,8 @@ function apiRemoveTask(boardId: string, columnId: string, id: string) {
   return async (dispatch: AppDispatch) => {
     try {
       await axios.delete(`/api/boards/${boardId}/columns/${columnId}/tasks/${id}`);
-      dispatch(tasksSlice.actions.removeTask(id));
-      dispatch(columnsActions.removeTaskIdFromColumn({ columnId, taskId: id }));
+      dispatch(tasksSlice.actions.removeTask({ id, columnId }));
+      dispatch(columnsActions.removeTaskIdFromColumn({ boardId, columnId, taskId: id }));
     } catch (error) {
       throw error;
     }

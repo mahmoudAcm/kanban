@@ -11,12 +11,14 @@ export const getTasksProps = (task: {
     title: string;
     isCompleted: boolean;
   }[];
+  columnId: string;
 }) => {
   return {
     id: task.id,
     title: task.title,
     subtasksCount: task.subtasks.length,
-    completedSubtasksCount: task.subtasks.reduce((sum, subtask) => sum + +subtask.isCompleted, 0)
+    completedSubtasksCount: task.subtasks.reduce((sum, subtask) => sum + +subtask.isCompleted, 0),
+    columnId: task.columnId
   };
 };
 
@@ -25,6 +27,7 @@ interface TaskProps {
   title: string;
   subtasksCount: number;
   completedSubtasksCount: number;
+  columnId: string;
 }
 
 export default function Task(props: TaskProps) {
@@ -49,7 +52,7 @@ export default function Task(props: TaskProps) {
       }}
       onClick={() => {
         dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.VIEW_TASK_DIALOG }));
-        dispatch(tasksActions.setActiveTaskId(props.id));
+        dispatch(tasksActions.setActiveTaskId({ id: props.id, columnId: props.columnId }));
       }}
     >
       <Typography variant='h3'>{props.title}</Typography>

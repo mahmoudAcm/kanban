@@ -1,14 +1,13 @@
 import { Box, styled, Typography } from '@mui/material';
-import Task, { getTasksProps } from '@/src/components/Task';
 import { useAppDispatch } from '@/src/store';
 import { dialogsActions } from '@/src/slices/dialogs';
 import { DIALOG_IDS } from '@/src/constants';
 import useBoardsSelector from '@/src/hooks/useBoardsSelector';
-import { useActiveColumnsSelector } from '@/src/hooks/useColumnsSelector';
-import useTasksSelector from '@/src/hooks/useTasksSelector';
+import useColumnsSelector from '@/src/hooks/useColumnsSelector';
 import EmptyBoard from '@/src/components/Board/EmptyBoard';
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import ColumnList from '@/src/components/Board/ColumnList';
 
 export const BoardRoot = styled(Box)(({ theme }) => ({
   width: '100%',
@@ -20,19 +19,6 @@ export const BoardRoot = styled(Box)(({ theme }) => ({
   [theme.breakpoints.down('sm')]: {
     paddingInline: 16
   }
-}));
-
-export const Status = styled(Typography)(() => ({
-  color: 'var(--medium-grey)',
-  display: 'flex'
-}));
-
-export const Column = styled(Box)(() => ({
-  minWidth: 280,
-  maxWidth: 280,
-  display: 'grid',
-  gap: 24,
-  alignContent: 'start'
 }));
 
 export const AddNewColumnButton = styled(Box)(({ theme }) => ({
@@ -56,16 +42,10 @@ export const AddNewColumnButton = styled(Box)(({ theme }) => ({
   }
 }));
 
-function getStatusColor(index: number) {
-  const colors = ['#49C4E5', '#8471F2', '#67E2AE', '#EB144C', '#FF6900', '#ABB8C3'];
-  return colors[index % colors.length];
-}
-
 export default function Board() {
   const dispatch = useAppDispatch();
-  const columns = useActiveColumnsSelector();
-  const tasks = useTasksSelector(({ tasks }) => tasks);
   const board = useBoardsSelector(({ boards, activeBoardId }) => boards[activeBoardId]);
+  const columns = useColumnsSelector(({ columnsOf }) => columnsOf?.[board?.id!]);
   const isBoardsReady = useBoardsSelector(({ isBoardsReady }) => isBoardsReady);
   const router = useRouter();
 
@@ -85,30 +65,9 @@ export default function Board() {
   return (
     <BoardRoot>
       {board.columns.map((column, index) => {
-        const tasksIds = columns[column.id];
+        const tasksIds = columns?.[column.id] ?? [];
         return (
-          <Column key={index}>
-            <Status variant='h4'>
-              <Box
-                sx={{
-                  width: '15px',
-                  height: '15px',
-                  borderRadius: '50%',
-                  // background: 'hsla(193, 75%, 59%, 1)',
-                  background: getStatusColor(index),
-                  mr: '12px'
-                }}
-              />
-              {column.name} ({tasksIds.length})
-            </Status>
-            <Box sx={{ display: 'grid', gap: '20px' }}>
-              {tasksIds.map((taskId, index) => {
-                const task = tasks?.[taskId];
-                if (!task) return <></>;
-                return <Task key={index} {...getTasksProps(task)} />;
-              })}
-            </Box>
-          </Column>
+          <ColumnList key={column.id} columnName={column.name} columnId={column.id} index={index} tasksIds={tasksIds} />
         );
       })}
       <AddNewColumnButton

@@ -1,7 +1,8 @@
 import { Box, Skeleton } from '@mui/material';
 import Task, { getTasksProps } from '@/src/components/Task';
 import data from '@/src/data.json';
-import { AddNewColumnButton, BoardRoot, Column, Status } from '@/src/components/Board/Board';
+import { AddNewColumnButton, BoardRoot } from '@/src/components/Board/Board';
+import { Column, Status } from '@/src/components/Board/ColumnList';
 
 export default function BoardLoadingScreen() {
   return (

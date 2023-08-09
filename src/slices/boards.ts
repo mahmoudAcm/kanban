@@ -83,11 +83,17 @@ function apiInitiateBoards() {
     await $sleep(700);
 
     for (const board of data) {
-      dispatch(columnsActions.updateOrAddColumns(board.columns.map(({ id }) => id)));
+      dispatch(columnsActions.updateOrAddColumns({ boardId: board.id, tasksIds: board.columns.map(({ id }) => id) }));
       for (const column of board.columns) {
         for (const task of column.tasks) {
           dispatch(tasksActions.updateOrAddTask(task));
-          dispatch(columnsActions.addTaskIdToColumn({ columnId: column.id, taskId: task.id }));
+          dispatch(
+            columnsActions.addTaskIdToColumn({
+              boardId: board.id,
+              columnId: column.id,
+              taskId: task.id
+            })
+          );
         }
       }
     }
@@ -103,7 +109,12 @@ function apiAddBoard(board: { name: string; columns: { name: string }[] }) {
       const data = res.data;
       dispatch(boardsSlice.actions.updateOrAddBoard(data.board));
       dispatch(boardsSlice.actions.increaseCount());
-      dispatch(columnsActions.updateOrAddColumns(data.board.columns.map(({ id }) => id)));
+      dispatch(
+        columnsActions.updateOrAddColumns({
+          boardId: data.board.id,
+          tasksIds: data.board.columns.map(({ id }) => id)
+        })
+      );
     } catch (error) {
       throw error;
     }
@@ -116,7 +127,12 @@ function apiUpdateBoard(board: { id: string; name: string; columns: { id?: strin
       const res = await axios.put<{ message: string; board: Board }>('/api/boards/' + board.id, board);
       const data = res.data;
       dispatch(boardsSlice.actions.updateOrAddBoard(data.board));
-      dispatch(columnsActions.updateOrAddColumns(data.board.columns.map(({ id }) => id)));
+      dispatch(
+        columnsActions.updateOrAddColumns({
+          boardId: data.board.id,
+          tasksIds: data.board.columns.map(({ id }) => id)
+        })
+      );
       return data.message;
     } catch (error) {
       throw error;
@@ -129,7 +145,7 @@ function apiRemoveBoard(board: Board) {
     await axios.delete('/api/boards/' + board.id);
     const columns = board.columns;
     for (const column of columns) {
-      dispatch(columnsActions.removeColumn(column.id));
+      dispatch(columnsActions.removeColumn({ boardId: column.boardId, id: column.id }));
     }
     dispatch(boardsActions.removeBoard(board.id));
   };

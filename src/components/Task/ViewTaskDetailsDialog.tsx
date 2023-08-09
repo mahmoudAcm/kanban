@@ -21,7 +21,7 @@ export default function ViewTaskDetailsDialog() {
     [DIALOG_IDS.VIEW_TASK_DIALOG]: { show }
   } = useDialogsSelector();
   const board = useBoardsSelector(({ boards, activeBoardId }) => boards[activeBoardId]);
-  const task = useTasksSelector(({ tasks, activeTaskId }) => tasks[activeTaskId]);
+  const task = useTasksSelector(({ tasksOf, activeTask }) => tasksOf?.[activeTask.columnId]?.[activeTask.id]);
   const dispatch = useAppDispatch();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 

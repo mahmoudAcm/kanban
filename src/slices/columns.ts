@@ -5,38 +5,40 @@ import { AppDispatch } from '@/src/store';
 export const columnsSlice = createSlice({
   name: '__columns',
   initialState: {
-    columns: {} as Record<string, string[]>
+    columnsOf: {} as Record<string, Record<string, string[]>>
   },
   reducers: {
-    updateOrAddColumns(state, action: PayloadAction<string[]>) {
-      const ids = action.payload;
-      for (const id of ids) {
-        state.columns[id] ??= [];
+    updateOrAddColumns(state, action: PayloadAction<{ boardId: string; tasksIds: string[] }>) {
+      const { boardId, tasksIds } = action.payload;
+      for (const id of tasksIds) {
+        if (!state.columnsOf[boardId]) state.columnsOf[boardId] = {};
+        state.columnsOf[boardId][id] ??= [];
       }
     },
-    removeColumn(state, action: PayloadAction<string>) {
-      const id = action.payload;
-      const taskIds = state.columns[id];
-      for (const id of taskIds) {
-        tasksActions.removeTask(id);
+    removeColumn(state, action: PayloadAction<{ boardId: string; id: string }>) {
+      const { boardId, id } = action.payload;
+      const taskIds = state.columnsOf?.[boardId]?.[id];
+      for (const taskId of taskIds) {
+        tasksActions.removeTask({ columnId: id, id: taskId });
       }
-      delete state.columns[id];
+      delete state.columnsOf[id];
     },
-    addTaskIdToColumn(state, action: PayloadAction<{ columnId: string; taskId: string }>) {
-      const { columnId, taskId } = action.payload;
-      if (!state.columns[columnId].includes(taskId)) state.columns[columnId].push(taskId);
+    addTaskIdToColumn(state, action: PayloadAction<{ boardId: string; columnId: string; taskId: string }>) {
+      const { boardId, columnId, taskId } = action.payload;
+      if (!state.columnsOf?.[boardId]?.[columnId].includes(taskId)) state.columnsOf[boardId][columnId].push(taskId);
     },
-    removeTaskIdFromColumn(state, action: PayloadAction<{ columnId: string; taskId: string }>) {
-      const { columnId, taskId } = action.payload;
-      state.columns[columnId] = state.columns[columnId].filter(id => id !== taskId);
+    removeTaskIdFromColumn(state, action: PayloadAction<{ boardId: string; columnId: string; taskId: string }>) {
+      const { boardId, columnId, taskId } = action.payload;
+      if (!state.columnsOf[boardId]) state.columnsOf[boardId] = {};
+      state.columnsOf[boardId][columnId] = state.columnsOf[boardId]?.[columnId].filter(id => id !== taskId);
     }
   }
 });
 
-function moveTaskBetweenColumns(srcColumnId: string, destColumnId: string, taskId: string) {
+function moveTaskBetweenColumns(boardId: string, srcColumnId: string, destColumnId: string, taskId: string) {
   return async (dispatch: AppDispatch) => {
-    dispatch(columnsActions.removeTaskIdFromColumn({ columnId: srcColumnId, taskId }));
-    dispatch(columnsActions.addTaskIdToColumn({ columnId: destColumnId, taskId }));
+    dispatch(columnsActions.removeTaskIdFromColumn({ boardId, columnId: srcColumnId, taskId }));
+    dispatch(columnsActions.addTaskIdToColumn({ boardId, columnId: destColumnId, taskId }));
   };
 }
 

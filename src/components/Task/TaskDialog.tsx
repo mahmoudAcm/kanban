@@ -54,7 +54,7 @@ export default function TaskDialog() {
     [DIALOG_IDS.TASK_DIALOG]: { show, type }
   } = useDialogsSelector();
   const board = useBoardsSelector(({ boards, activeBoardId }) => boards[activeBoardId]);
-  const task = useTasksSelector(({ tasks, activeTaskId }) => tasks[activeTaskId]);
+  const task = useTasksSelector(({ tasksOf, activeTask }) => tasksOf?.[activeTask.columnId]?.[activeTask.id]);
   const isSubmittingRef = useRef(false);
   const scrollRef = useRef<HTMLElement | null>(null);
   const timeoutRef = useRef<any>(null);
@@ -118,7 +118,7 @@ export default function TaskDialog() {
       }
 
       if (type === 'edit') {
-        await dispatch(tasksActions.apiUpdateTask(board?.id!, status.columnId!, task?.id!, data));
+        await dispatch(tasksActions.apiUpdateTask(board?.id!, task?.columnId!, status.columnId!, task?.id!, data));
       }
 
       setStatusCode(200);

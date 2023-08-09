@@ -74,7 +74,7 @@ const App: FunctionComponent<AppProps> = props => {
       <Head>
         <meta
           property='description'
-          content='Enhance productivity and organization with our Kanban Task Management App. Streamline your tasks, boost collaboration, and achieve your goals efficiently. Try it now for a more organized work and personal life.'
+          content='Enhance productivity and organization with our Kanban Task Management App. Streamline your tasksOf, boost collaboration, and achieve your goals efficiently. Try it now for a more organized work and personal life.'
         />
         <meta
           property='og:image'

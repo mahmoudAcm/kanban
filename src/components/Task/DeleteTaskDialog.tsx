@@ -17,8 +17,8 @@ export default function DeleteTaskDialog() {
   } = useDialogsSelector();
   const taskNameRef = useRef('');
   const [isSubmitting, setSubmitting] = useState(false);
-  const task = useTasksSelector(({ tasks, activeTaskId }) => {
-    return tasks[activeTaskId];
+  const task = useTasksSelector(({ tasksOf, activeTask }) => {
+    return tasksOf?.[activeTask.columnId]?.[activeTask.id];
   });
   const boardId = useBoardsSelector(({ boards, activeBoardId }) => boards[activeBoardId]?.id);
 
