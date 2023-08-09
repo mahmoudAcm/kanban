@@ -14,6 +14,7 @@ import store from '@/src/store';
 import { PageLoadingProvider } from '@/src/contexts/PageLoadingContext';
 import { ClerkProvider, useAuth } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -69,40 +70,61 @@ const App: FunctionComponent<AppProps> = props => {
   const guestGuard = Component.guestGuard ?? false;
 
   return (
-    <ClerkProvider {...pageProps}>
-      <CacheProvider value={emotionCache}>
-        <Provider store={store}>
-          <PageLoadingProvider>
-            <CustomThemeProvider>
-              <CssBaseline />
-              <Box
-                sx={{
-                  '& .Toastify__toast': {
-                    boxShadow: '0px 10px 20px 0px rgba(54, 78, 126, 0.25)'
-                  },
-                  '& .Toastify__toast-container': {
-                    '@media (max-width: 487px)': {
-                      width: 'calc(100% - 2em)',
-                      top: '1em',
-                      left: '1em',
-                      right: '1em',
-                      '& .Toastify__toast': {
-                        marginBottom: '1rem'
+    <>
+      <Head>
+        <meta
+          property='description'
+          content='Enhance productivity and organization with our Kanban Task Management App. Streamline your tasks, boost collaboration, and achieve your goals efficiently. Try it now for a more organized work and personal life.'
+        />
+        <meta
+          property='og:image'
+          content='https://res.cloudinary.com/ddjyoosog/image/upload/v1691598938/Desktop_-_Board_-_Light_bed2ot.jpg'
+        />
+        <meta property='og:title' content='Kanban Task Management App' />
+        <meta property='og:url' content='https://kanban-task-management-app-beige.vercel.app/boards' />
+
+        <meta
+          property='twitter:image'
+          content='https://res.cloudinary.com/ddjyoosog/image/upload/v1691598938/Desktop_-_Board_-_Light_bed2ot.jpg'
+        />
+        <meta property='twitter:card' content='summary_large_image' />
+        <meta property='twitter:title' content='Kanban Task Management App' />
+      </Head>
+      <ClerkProvider {...pageProps}>
+        <CacheProvider value={emotionCache}>
+          <Provider store={store}>
+            <PageLoadingProvider>
+              <CustomThemeProvider>
+                <CssBaseline />
+                <Box
+                  sx={{
+                    '& .Toastify__toast': {
+                      boxShadow: '0px 10px 20px 0px rgba(54, 78, 126, 0.25)'
+                    },
+                    '& .Toastify__toast-container': {
+                      '@media (max-width: 487px)': {
+                        width: 'calc(100% - 2em)',
+                        top: '1em',
+                        left: '1em',
+                        right: '1em',
+                        '& .Toastify__toast': {
+                          marginBottom: '1rem'
+                        }
                       }
                     }
-                  }
-                }}
-              >
-                <ToastContainer limit={4} newestOnTop containerId='ToastContainer-1' />
-              </Box>
-              <Authenticated authGuard={authGuard} guestGuard={guestGuard}>
-                {getLayout(<Component {...pageProps} />)}
-              </Authenticated>
-            </CustomThemeProvider>
-          </PageLoadingProvider>
-        </Provider>
-      </CacheProvider>
-    </ClerkProvider>
+                  }}
+                >
+                  <ToastContainer limit={4} newestOnTop containerId='ToastContainer-1' />
+                </Box>
+                <Authenticated authGuard={authGuard} guestGuard={guestGuard}>
+                  {getLayout(<Component {...pageProps} />)}
+                </Authenticated>
+              </CustomThemeProvider>
+            </PageLoadingProvider>
+          </Provider>
+        </CacheProvider>
+      </ClerkProvider>
+    </>
   );
 };
 
