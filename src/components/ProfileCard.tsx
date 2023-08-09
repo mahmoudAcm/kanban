@@ -3,6 +3,9 @@ import { Roboto } from 'next/font/google';
 import HorizontalDotsIcon from '@/src/icons/HorizontalDotsIcon';
 import { MouseEvent, useEffect, useId, useRef, useState } from 'react';
 import { SignOutButton, useUser } from '@clerk/nextjs';
+import { dialogsActions } from '@/src/slices/dialogs';
+import { DIALOG_IDS } from '@/src/constants';
+import { useAppDispatch } from '@/src/store';
 
 const robotoFont = Roboto({
   weight: ['400', '700'],
@@ -48,6 +51,7 @@ const StyledTypography = styled(Typography)(({ theme }) => ({
 }));
 
 export default function ProfileCard() {
+  const dispatch = useAppDispatch();
   const id = useId();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -71,9 +75,9 @@ export default function ProfileCard() {
     }
   }, [user]);
 
-  const email = (userRef.current ?? user)?.primaryEmailAddress?.emailAddress;
-  const fullName = (userRef.current ?? user)?.fullName;
-  const imageUrl = (userRef.current ?? user)?.imageUrl ?? '';
+  const email = (user ?? userRef.current)?.primaryEmailAddress?.emailAddress;
+  const fullName = (user ?? userRef.current)?.fullName;
+  const imageUrl = (user ?? userRef.current)?.imageUrl ?? '';
 
   return (
     <>
@@ -115,9 +119,20 @@ export default function ProfileCard() {
           'aria-labelledby': id + 'profile-button'
         }}
       >
-        <MenuItem onClick={handleClose}>Add an existing account</MenuItem>
+        <MenuItem
+          onClick={() => {
+            dispatch(dialogsActions.showDialog({ id: DIALOG_IDS.PROFILE_DIALOG }));
+            handleClose();
+          }}
+        >
+          Manage Account Information
+        </MenuItem>
         <SignOutButton>
-          <MenuItem>Log out {email}</MenuItem>
+          <MenuItem>
+            <span style={{ width: '26ch', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+              Log out {email}
+            </span>
+          </MenuItem>
         </SignOutButton>
       </Menu>
       <ProfileCardRoot

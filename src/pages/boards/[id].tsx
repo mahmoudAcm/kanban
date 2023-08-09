@@ -13,6 +13,7 @@ import useBoardsSelector from '@/src/hooks/useBoardsSelector';
 import { useRouter } from 'next/router';
 import DeleteBoardDialog from '@/src/components/Board/DeleteBoardDialog';
 import DeleteTaskDialog from '@/src/components/Task/DeleteTaskDialog';
+import ProfileDialog from '@/src/components/Dialogs/ProfileDialog';
 
 function BoardPage() {
   const router = useRouter();
@@ -45,6 +46,7 @@ function BoardPage() {
       <ViewTaskDetailsDialog />
       <DeleteBoardDialog />
       <DeleteTaskDialog />
+      <ProfileDialog />
       {!isBoardsReady ? <BoardLoadingScreen /> : <Board />}
     </Box>
   );

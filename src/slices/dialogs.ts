@@ -10,7 +10,8 @@ const slice = createSlice({
     [DIALOG_IDS.TASK_DIALOG]: { show: false, type: 'create' as DialogType, name: 'TASK_DIALOG' },
     [DIALOG_IDS.VIEW_TASK_DIALOG]: { show: false, name: 'VIEW_TASK_DIALOG' },
     [DIALOG_IDS.DELETE_BOARD_DIALOG]: { show: false, name: 'DELETE_BOARD_DIALOG' },
-    [DIALOG_IDS.DELETE_TASK_DIALOG]: { show: false, name: 'DELETE_TASK_DIALOG' }
+    [DIALOG_IDS.DELETE_TASK_DIALOG]: { show: false, name: 'DELETE_TASK_DIALOG' },
+    [DIALOG_IDS.PROFILE_DIALOG]: { show: false, name: 'PROFILE_DIALOG' }
   } as Record<string, { show: boolean; type?: DialogType }>,
   reducers: {
     showDialog(state, action: PayloadAction<{ id: string; type?: DialogType }>) {
