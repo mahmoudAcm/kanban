@@ -1,4 +1,4 @@
-import { Box, useTheme } from '@mui/material';
+import { alpha, Box, useTheme } from '@mui/material';
 import { UserProfile } from '@clerk/nextjs';
 import useDialogsSelector from '@/src/hooks/useDialogsSelector';
 import { DIALOG_IDS } from '@/src/constants';
@@ -73,7 +73,7 @@ export default function ProfileDialog() {
                       color: mode === 'DARK' ? theme.palette.common.white : theme.palette.common.black,
                       boxShadow: 'none !important'
                     },
-                    "& [data-localization-key$='formButtonReset']": {
+                    "& [data-localization-key$='formButtonReset']:not(.cl-avatarImageActionsUpload)": {
                       '--accent': 'var(--main-purple) !important',
                       transition: theme.transitions.create('background'),
                       '&:focus': {
@@ -82,7 +82,7 @@ export default function ProfileDialog() {
                       '&:active,&:hover': {
                         boxShadow: 'none !important',
                         background:
-                          mode === 'DARK' ? 'white !important' : 'hsla(var(--main-purple-alpha), 0.25) !important'
+                          mode === 'DARK' ? 'white !important' : 'hsla(var(--main-purple-alpha), 0.1) !important'
                       }
                     },
                     ['& ' +
@@ -90,7 +90,8 @@ export default function ProfileDialog() {
                     "[data-localization-key$='formHint'], " +
                     "[data-localization-key$='detailsTitle__primary'], " +
                     "[data-localization-key$='destructiveActionTitle'], " +
-                    "[data-localization-key$='formHint__noAccounts']"]: {
+                    "[data-localization-key$='formHint__noAccounts']," +
+                    "[data-localization-key^='userProfile.connectedAccountPage.removeResource']"]: {
                       color: mode === 'DARK' ? 'white !important' : undefined
                     },
                     "[data-localization-key$='detailsSubtitle__primary'], [data-localization-key$='destructiveActionSubtitle']":
@@ -189,6 +190,28 @@ export default function ProfileDialog() {
                   breadcrumbsItemDivider: { color: mode === 'DARK' ? 'white !important' : undefined },
                   breadcrumbsItem__currentPage: {
                     color: mode === 'DARK' ? 'var(--medium-grey) !important' : undefined
+                  },
+                  fileDropAreaBox: {
+                    background:
+                      mode === 'DARK' ? alpha(theme.palette.background.default, 0.4) + ' !important' : undefined
+                  },
+                  fileDropAreaIconBox: {
+                    background: mode === 'DARK' ? theme.palette.background.default + ' !important' : undefined
+                  },
+                  fileDropAreaIcon: { color: mode === 'DARK' ? 'white !important' : undefined },
+                  fileDropAreaHint: { color: mode === 'DARK' ? 'white !important' : undefined },
+                  fileDropAreaFooterHint: { color: mode === 'DARK' ? 'white !important' : undefined },
+                  fileDropAreaButtonPrimary: {
+                    '--accent': 'var(--main-purple) !important',
+                    transition: theme.transitions.create('background'),
+                    '&:focus': {
+                      boxShadow: 'var(--main-purple-hover) 0px 0px 0px 3px !important'
+                    },
+                    '&:active,&:hover': {
+                      boxShadow: 'none !important',
+                      background:
+                        mode === 'DARK' ? 'white !important' : 'hsla(var(--main-purple-alpha), 0.25) !important'
+                    }
                   }
                 }
               }}
