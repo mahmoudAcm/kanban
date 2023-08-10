@@ -75,13 +75,14 @@ export default function ProfileDialog() {
                     },
                     "& [data-localization-key$='formButtonReset']": {
                       '--accent': 'var(--main-purple) !important',
+                      transition: theme.transitions.create('background'),
                       '&:focus': {
                         boxShadow: 'var(--main-purple-hover) 0px 0px 0px 3px !important'
                       },
                       '&:active,&:hover': {
                         boxShadow: 'none !important',
-                        color: 'white !important',
-                        background: 'transparent !important'
+                        background:
+                          mode === 'DARK' ? 'white !important' : 'hsla(var(--main-purple-alpha), 0.25) !important'
                       }
                     },
                     ['& ' +
