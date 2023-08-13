@@ -16,12 +16,14 @@ export const clerkAppearanceElements: SignUpTheme['elements'] = {
     height: '37px'
   },
   rootBox: {
-    '@media(max-width:400px)': {
+    '@media(max-width:460px)': {
+      maxWidth: 'auto !important',
       width: '100%'
     }
   },
   card: {
-    '@media(max-width:400px)': {
+    '@media(max-width:460px)': {
+      maxWidth: 'auto',
       width: '100%'
     },
     padding: '2rem',
